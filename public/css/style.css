@@ -62,7 +62,8 @@ body {
   transition: background 0.3s ease;
 }
 .cat-card:hover {
-  background: #3e6bb5;
+  /* background: #3e6bb5; */
+  background: #2c5ba7;
   cursor: pointer;
 }
 
