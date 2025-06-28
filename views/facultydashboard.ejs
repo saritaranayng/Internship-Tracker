@@ -1,0 +1,115 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Faculty Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .logout {
+            float: right;
+            background: red;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        th {
+            background: #2c3e50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome, <%= staff.firstname %> <%= staff.lastname %>!</h1>
+        <form action="/faculty/logout" method="POST" style="display:inline;">
+            <button class="logout" type="submit">Logout</button>
+        </form>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Your Profile</h2>
+            <p><strong>Email:</strong> <%= staff.email %></p>
+            <p><strong>Department:</strong> <%= staff.department %></p>
+            <p><strong>Designation:</strong> <%= staff.designation %></p>
+        </div>
+
+        <div class="card">
+            <h2>Student Logs</h2>
+            <% if (students && students.length > 0) { %>
+                <table>
+                   <tr>
+  <th>Student Name</th>
+  <th>Date</th>
+  <th>Log</th>
+  <th>Status</th>
+  <th>File</th> <!-- ✅ new column -->
+  <th>Actions</th>
+</tr>
+<% students.forEach(student => { %>
+  <tr>
+    <td><%= student.name %></td>
+    <td><%= student.date %></td>
+    <td><%= student.log %></td>
+    <td><%= student.status %></td>
+    <td>
+      <% if (student.file) { %>
+        <a href="/uploads/<%= student.file %>" target="_blank">View</a>
+      <% } else { %>
+        No File
+      <% } %>
+    </td>
+    <td>
+      <form action="/faculty/approve/<%= student._id %>" method="POST" style="display:inline;">
+        <button type="submit">Approve</button>
+      </form>
+      <form action="/faculty/reject/<%= student._id %>" method="POST" style="display:inline;">
+        <button type="submit">Reject</button>
+      </form>
+    </td>
+  </tr>
+<% }) %>
+                </table>
+            <% } else { %>
+                <p>No logs submitted yet.</p>
+            <% } %>
+        </div>
+    </div>
+    <!-- Footer -->
+  <%- include('partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<style>
+
+    form {
+        width: 50%;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #f4f4f4;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        font-family: Arial, sans-serif;
+    }
+
+    label {
+        font-weight: bold;
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    input[type="number"],
+    input[type="file"],
+    textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        resize: vertical;
+    }
+
+    a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    button {
+        margin-top: 20px;
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+</style>
+
+<form action="/student/editlog/<%= log._id %>" method="POST" enctype="multipart/form-data">
+    <label>Week:</label>
+    <input type="number" name="week" value="<%= log.week %>" required>
+
+    <label>Description:</label>
+    <textarea name="description" rows="4" required><%= log.description %></textarea>
+
+    <label>Current File:</label>
+    <% if (log.file) { %>
+        <a href="/uploads/<%= log.file %>" target="_blank">View</a>
+    <% } else { %>
+        <span>No file uploaded.</span>
+    <% } %>
+
+    <label>Upload New File:</label>
+    <input type="file" name="file">
+
+    <button type="submit">Update Log</button>
+    
+</form>

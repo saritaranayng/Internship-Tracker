@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+<link rel="stylesheet" href="/css/style.css">    
+               
+</head>
+<body>
+  <div class="signup-page">
+    <div class="signup-card">
+        <h2> FREE SIGN UP FOR STUDENTS</h2>
+        <h3>1500+ companies are hiring on Skill Record</h3>
+        <form action="/signup" method="POST">
+            <label>Email</label><br>
+            <input type="email" id="mail" name="email" placeholder="skillrecord@example.com" required>
+            <label>Password</label><br>
+            <input type="password" id="pwd" name="password" placeholder="Must be atleast 6 characters" required>
+            <div class="name-row">
+                <div class="field">
+                  <label for="fname">First Name</label>
+                  <input type="text" id="fname" name="firstname" placeholder="Sarita" required>
+                </div>
+                <div class="field">
+                  <label for="lname">Last Name</label>
+                  <input type="text" id="lname" name="lastname" placeholder="Rana" required>
+                </div>
+              </div>
+              <label for="department">Department:</label>
+               <input type="text" id="department" name="department" required><br>
+              <label>Course</label>
+              <input type="text" id="course" name="course" required>
+              <label>roll no</label>
+              <input type="text" id="Number" name="rollno" required>
+              
+            <!-- <label>First Name</label><br>
+            <input type="text" id="fname" placeholder="Sarita">
+            <label>Last Name</label>
+            <input type="text" id="lname" placeholder="Rana"><br> -->
+            <button type="button" onclick="window.location.href='/terms'">Terms and Conditions</button>
+            <button type="submit" id="btn">sign up</button>
+            <p>Already have an account ?
+            <button type="submit" id="btn2" onclick="window.location.href='/Slogin'">log In</button> </p>
+            <button type="button" onclick="window.location.href='/'">BACK</button>
+            <% if (message && message.length > 0) { %>
+          <script>
+            alert("<%= message %>");
+          </script>
+        <% } %>
+         </form>
+    
+
+    <!-- Footer -->
+  <%- include('partials/footer') %>
+</body>
+</html>

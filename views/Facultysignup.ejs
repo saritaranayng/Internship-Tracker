@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Faculty Signup - Skill Record</title>
+  <style>
+    /* Overall Page Layout */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #dfe9f3, #ffffff); /* light blue to white */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Signup Page Wrapper */
+    .fsignup-page {
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* Signup Card Styling */
+    .signup-card {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+
+    /* Main Heading */
+    .heading {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #2c3e50;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    /* Subheading */
+    .signup-card h3 {
+      text-align: center;
+      font-size: 14px;
+      color: #6c757d;
+      margin-bottom: 25px;
+    }
+
+    /* Form */
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 14px;
+      margin-bottom: 5px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    /* Input Styling */
+    input {
+      padding: 10px 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      background-color: #f9f9f9;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #00ffe1;
+      outline: none;
+    }
+
+    /* Name Row */
+    .name-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .name-row .field {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Paragraph */
+    p {
+      text-align: center;
+      font-size: 14px;
+      color: #555;
+      margin: 10px 0;
+    }
+
+    /* Buttons */
+    button {
+      padding: 10px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    /* Terms Button */
+    .terms-btn {
+      background: transparent;
+      
+     background-color: #0a7b7e;
+      margin-bottom: 10px;
+    }
+
+    .signup-card button[type="button"] {
+      background-color: transparent;
+      border: 1.5px solid #0a7b7e;
+      color: #0a7b7e;
+    }
+
+    .terms-btn:hover,
+    .signup-card button[type="button"]:hover {
+      background-color: #0a7b7e;
+      color: #fff;
+    }
+
+    /* Submit and Login Buttons */
+    #btn,
+    #btn2 {
+      background-color: #0a7b7e;
+      color: #fff;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    #btn:hover,
+    #btn2:hover {
+      background-color: #0a7b7e;
+    }
+  </style>
+</head>
+<body>
+  <div class="fsignup-page">
+    <div class="signup-card">
+      <h2 class="heading">SIGN UP FOR FREE FOR FACULTY</h2>
+      <h3>1500+ companies are hiring on Skill Record</h3>
+      <form action="/signupf" method="POST">
+        <label>Email</label>
+        <input type="email" id="mail" name="email" placeholder="skillrecord@example.com" required />
+        
+        <label>Password</label>
+        <input type="password" id="pwd" name="password" placeholder="Must be at least 6 characters" required />
+        
+        <div class="name-row">
+          <div class="field">
+            <label for="fname">First Name</label>
+            <input type="text" id="fname" name="firstname" placeholder="Sarita" required />
+          </div>
+          <div class="field">
+            <label for="lname">Last Name</label>
+            <input type="text" id="lname" name="lastname" placeholder="Rana" required />
+          </div>
+        </div>
+
+        <label>Department</label>
+        <input type="text" id="depart" name="department" />
+        
+        <label>Designation</label>
+        <input type="text" id="des" name="designation" />
+        
+        <button type="button" class="terms-btn" onclick="window.location.href='/terms2'">Terms and Conditions</button>
+        <button type="submit" id="btn">Sign Up</button>
+
+        <p>Already have an account?</p>
+        <button type="button" id="btn2" onclick="window.location.href='/Flogin'">Log In</button>
+        <button type="button" onclick="window.location.href='/'">Back</button>
+
+        <% if (message && message.length > 0) { %>
+          <script>
+            alert("<%= message %>");
+          </script>
+        <% } %>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

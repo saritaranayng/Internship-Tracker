@@ -1,0 +1,284 @@
+/* Reset some basics */
+/* --- Global --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: #fff;
+}
+
+/* Hero Banner */
+.hero {
+  height: 60vh;
+  background: url('/images/hero-bg.jpg') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.hero-content h1 {
+  font-size: 3em;
+  text-shadow: 0 3px 10px rgba(0,0,0,0.5);
+}
+.hero-content p {
+  font-size: 1.2em;
+  margin: 15px 0 30px;
+}
+.cta-btn {
+  background: #ffda79;
+  color: #1e3c72;
+  text-decoration: none;
+  padding: 15px 30px;
+  font-weight: bold;
+  border-radius: 30px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+.cta-btn:hover {
+  background: #ffd24d;
+  transform: translateY(-3px);
+}
+
+/* Categories Panel */
+.categories {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 40px 20px;
+}
+.cat-card {
+  background: #2a5298;
+  padding: 30px;
+  border-radius: 10px;
+  flex: 1 1 200px;
+  text-align: center;
+  font-size: 1.2em;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: background 0.3s ease;
+}
+.cat-card:hover {
+  background: #3e6bb5;
+  cursor: pointer;
+}
+
+/* Featured Internships */
+.featured {
+  padding: 60px 20px;
+  background: #112240;
+}
+.featured h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2em;
+}
+.cards-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+.feat-card {
+  background: #1e3c72;
+  flex: 1 1 250px;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  text-align: center;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+.feat-card:hover {
+  background: #364a75;
+  transform: translateY(-5px);
+}
+
+/* Footer (enhanced) */
+footer {
+  background: #0f1825;
+  padding: 40px 20px;
+}
+.footer-columns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  max-width: 1140px;
+  margin: auto;
+  color: #aaa;
+}
+.footer-col {
+  flex: 1 1 200px;
+  margin-bottom: 20px;
+}
+.footer-col h4 {
+  color: #ffda79;
+  margin-bottom: 12px;
+  font-size: 1.1em;
+}
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+}
+.footer-col li {
+  padding: 4px 0;
+  font-size: 0.9em;
+}
+.footer-col li a {
+  color: #fff;
+  text-decoration: none;
+}
+.footer-bottom {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 0.9em;
+  color: #888;
+}
+
+/* Media Query for Mobile */
+@media (max-width: 768px) {
+  .hero-content h1 { font-size: 2.2em; }
+  .cards-row { flex-direction: column; }
+}
+
+
+/* css for student sign up page */
+.signup-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90vh;
+  background-color: #f4f7f9; /* light subtle background like homepage */
+  padding: 20px;
+}
+
+.signup-page .signup-card {
+  width: 450px; /* wider for good layout */
+  background-color: #ffffff;
+  padding: 20px 30px;
+  border-radius: 15px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+}
+
+.signup-card h2 {
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 10px;
+  color: hsl(182, 85%, 27%); /* tealish like homepage buttons */
+  
+  margin-top: 0;
+  margin-bottom: 10px;
+
+}
+
+.signup-card h3 {
+  font-size: 14px;
+  text-align: center;
+  color: #666;
+  margin-bottom: 25px;
+  font-weight: 500;
+}
+
+.signup-card label {
+  font-size: 13px;
+  margin-bottom: 6px;
+  display: block;
+  font-weight: 600;
+  color: #444;
+}
+
+.signup-card input {
+  width: 100%;
+  padding: 9px 10px;
+  margin-bottom: 12px;
+  border: 1.8px solid #c1c1c1;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.signup-card input:focus {
+  border-color: #0a7b7e;
+  outline: none;
+}
+
+.name-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.name-row .field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.signup-card p {
+  font-size: 13px;
+  color: #555;
+  text-align: center;
+  margin: 15px 0 8px;
+}
+
+.signup-card button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.signup-card button#btn {
+  background-color: #0a7b7e;
+  color: white;
+}
+
+.signup-card button#btn:hover {
+  background-color: #095c5e;
+}
+
+.signup-card button[type="button"] {
+  background-color: transparent;
+  border: 1.5px solid #0a7b7e;
+  color: #0a7b7e;
+}
+
+.signup-card button[type="button"]:hover {
+  background-color: #0a7b7e;
+  color: white;
+}
+
+.signup-card p:last-child {
+  margin-top: 5px;
+  font-size: 14px;
+  color: #0a7b7e;
+  font-weight: 600;
+}
+
+.signup-card p:last-child button {
+  width: auto;
+  background: none;
+  border: none;
+  color: #0a7b7e;
+  padding: 0;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.signup-card p:last-child button:hover {
+  text-decoration: underline;
+}
+/* css for faculty signup form */
+
+

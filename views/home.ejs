@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Skill Record</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* Marquee Section */
+.marquee-container {
+  overflow: hidden;
+  background: #eaf6fd;
+  padding: 15px 0;
+}
+
+.marquee-images {
+  display: flex;
+  animation: scroll 20s linear infinite;
+  gap: 30px;
+}
+
+.marquee-images img {
+  height: 300px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Scroll animation */
+@keyframes scroll {
+  0% {
+    transform: translateX(100%)
+  }
+  100% {
+    transform: translateX(-100%)
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="marquee-container">
+  <div class="marquee-images">
+    <img src="/images/intern1.jpg" alt="Internship 1">
+    <img src="/images/intern2.jpg" alt="Internship 2">
+    <img src="/images/intern3.jpg" alt="Internship 3">
+    <img src="/images/intern4.jpg" alt="Internship 4">
+    <img src="/images/intern5.jpg" alt="Internship 5">
+  
+  </div> 
+  </div>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <h1>Launch Your Dream with Skill Record</h1>
+      <p>Find top internships and job opportunities crafted just for you.</p>
+      <a href="/Ssignup" class="cta-btn">Get Started as student </a>
+       <a href="/Fsignup" class="cta-btn">Get Started as faculty </a>
+    </div>
+  </header>
+
+  <!-- Categories Panel -->
+  <section class="categories">
+  <div class="cat-card" onclick="location.href='/internships'">Internships</div>
+  <div class="cat-card" onclick="location.href='/jobs'">Jobs</div>
+  <div class="cat-card" onclick="location.href='/courses'">Courses</div>
+  <div class="cat-card" onclick="location.href='/certifications'">Certifications</div>
+</section>
+
+  <!-- Feature Cards Section -->
+  <section class="featured">
+  <h2>Popular Internships</h2>
+  <div class="cards-row">
+    <div class="feat-card" onclick="showDetails('webdev')">Web Dev Internship</div>
+    <div class="feat-card" onclick="showDetails('datasci')">Data Science Internship</div>
+    <div class="feat-card" onclick="showDetails('uiux')">UI/UX Internship</div>
+    <div class="feat-card" onclick="showDetails('marketing')">Marketing Internship</div>
+  </div>
+</section>
+
+<!-- Place to show detailed cards -->
+<div id="internship-details" class="cards-row"></div>
+
+
+  <footer style="background-color: #dbdee6; color: #0f0a0a; padding: 40px 20px; font-family: 'Segoe UI', sans-serif;">
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-around; max-width: 1200px; margin: auto;">
+
+    <!-- Internships by Places -->
+    <div style="flex: 1 1 200px; margin: 10px;">
+      <h4>Internships by Places</h4>
+      <ul style="list-style: none; padding: 0;">
+        <li>India</li>
+        <li>Delhi</li>
+        <li>Bangalore</li>
+        <li>Hyderabad</li>
+        <li>Mumbai</li>
+        <li>Chennai</li>
+        <li>Gurgaon</li>
+        <li>Kolkata</li>
+        <li>Virtual</li>
+        <li>View all internships</li>
+      </ul>
+    </div>
+
+    <!-- Internships by Stream -->
+    <div style="flex: 1 1 200px; margin: 10px;">
+      <h4>Internships by Stream</h4>
+      <ul style="list-style: none; padding: 0;">
+        <li>Computer Science</li>
+        <li>Electronics</li>
+        <li>Mechanical</li>
+        <li>Civil</li>
+        <li>Marketing</li>
+        <li>Finance</li>
+        <li>Chemical</li>
+        <li>Research Fellowship</li>
+        <li>Campus Ambassador</li>
+        <li>View all</li>
+      </ul>
+    </div>
+
+    <!-- Courses -->
+    <div style="flex: 1 1 200px; margin: 10px;">
+      <h4>Certification Courses</h4>
+      <ul style="list-style: none; padding: 0;">
+        <li>Full Stack Development</li>
+        <li>Data Science</li>
+        <li>UI/UX Design</li>
+        <li>Digital Marketing</li>
+        <li>Product Management</li>
+        <li>EV Technology</li>
+        <li>Finance Modeling</li>
+        <li>HR Management</li>
+        <li>Supply Chain</li>
+      </ul>
+    </div>
+
+    <!-- Jobs -->
+    <div style="flex: 1 1 200px; margin: 10px;">
+      <h4>Jobs by Category</h4>
+      <ul style="list-style: none; padding: 0;">
+        <li>Delhi</li>
+        <li>Mumbai</li>
+        <li>Bangalore</li>
+        <li>Kolkata</li>
+        <li>Chennai</li>
+        <li>Web Dev</li>
+        <li>Marketing</li>
+        <li>Finance</li>
+        <li>Graphic Design</li>
+      </ul>
+    </div>
+
+    <!-- About Section -->
+    <div style="flex: 1 1 200px; margin: 10px;">
+      <h4>About SkillRecord</h4>
+      <ul style="list-style: none; padding: 0;">
+        <li>About us</li>
+        <li>We're hiring</li>
+        <li>Hire interns</li>
+        <li>Post a Job</li>
+        <li>Terms & Conditions</li>
+        <li>Privacy Policy</li>
+        <li>Contact</li>
+        <li>Sitemap</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div style="background: white; text-align: center; padding: 25px 10px; border-top: 1px solid #f6f4fc; margin-top: 30px;">
+  <p style="font-size: 18px; font-weight: bold; margin: 8px 0;">© 2025 SkillRecord</p>
+  <p style="font-size: 16px; font-weight: bold; margin: 5px 0;">Email: skillrecord@gmail.com</p>
+</div>
+</footer>
+<script>
+ 
+  function showDetails(type) {
+    const details = {
+      webdev: `
+        <div class="feat-card">
+          <h3>Full Stack Developer</h3>
+          <p><strong>Company:</strong> CodeCraft</p>
+          <p><strong>Duration:</strong> 3 Months</p>
+          <p><strong>Location:</strong> Remote</p>
+          <p><strong>Stipend:</strong> ₹5,000/month</p>
+        </div>
+        <div class="feat-card">
+          <h3>Frontend Developer</h3>
+          <p><strong>Company:</strong> DevSphere</p>
+          <p><strong>Duration:</strong> 2 Months</p>
+          <p><strong>Location:</strong> Delhi</p>
+          <p><strong>Stipend:</strong> ₹4,000/month</p>
+        </div>
+      `,
+      datasci: `
+        <div class="feat-card">
+          <h3>Data Analyst Intern</h3>
+          <p><strong>Company:</strong> DataBridge</p>
+          <p><strong>Duration:</strong> 6 Months</p>
+          <p><strong>Location:</strong> Bangalore</p>
+          <p><strong>Stipend:</strong> ₹8,000/month</p>
+        </div>
+        <div class="feat-card">
+          <h3>Machine Learning Intern</h3>
+          <p><strong>Company:</strong> MLX Labs</p>
+          <p><strong>Duration:</strong> 3 Months</p>
+          <p><strong>Location:</strong> Remote</p>
+          <p><strong>Stipend:</strong> ₹7,000/month</p>
+        </div>
+      `,
+      uiux: `
+        <div class="feat-card">
+          <h3>UI/UX Designer</h3>
+          <p><strong>Company:</strong> DesignWave</p>
+          <p><strong>Duration:</strong> 2 Months</p>
+          <p><strong>Location:</strong> Mumbai</p>
+          <p><strong>Stipend:</strong> ₹4,500/month</p>
+        </div>
+      `,
+      marketing: `
+        <div class="feat-card">
+          <h3>Marketing Intern</h3>
+          <p><strong>Company:</strong> BrandBoost</p>
+          <p><strong>Duration:</strong> 3 Months</p>
+          <p><strong>Location:</strong> Delhi</p>
+          <p><strong>Stipend:</strong> ₹6,000/month</p>
+        </div>
+        <div class="feat-card">
+          <h3>Content Marketing Intern</h3>
+          <p><strong>Company:</strong> WriteRight</p>
+          <p><strong>Duration:</strong> 1 Month</p>
+          <p><strong>Location:</strong> Remote</p>
+          <p><strong>Stipend:</strong> ₹3,000/month</p>
+        </div>
+      `
+    };
+
+    document.getElementById('internship-details').innerHTML = details[type];
+  }
+</script>
+
+</body>
+</html>

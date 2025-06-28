@@ -1,0 +1,21 @@
+{
+  "name": "apnaproject",
+  "version": "1.0.0",
+  "description": "for making internship tracker",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "sarita rana",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-mongoose": "^0.1.0",
+    "express-session": "^1.18.1",
+    "mongoose": "^8.14.2",
+    "multer": "^2.0.0",
+    "path": "^0.12.7"
+  }
+}
