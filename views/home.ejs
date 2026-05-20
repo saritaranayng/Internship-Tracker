@@ -1,245 +1,229 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Skill Record</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Internship Tracker | Skill Record</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    /* Marquee Section */
-.marquee-container {
-  overflow: hidden;
-  background: #eaf6fd;
-  padding: 15px 0;
-}
+    /* Custom page-specific animations */
+    .marquee-container {
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 40px 0;
+      border-top: 1px solid var(--glass-border);
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .marquee-content {
+      display: flex;
+      gap: 50px;
+      animation: scroll 30s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-content img {
+      height: 60px;
+      opacity: 0.6;
+      filter: grayscale(1);
+      transition: var(--transition);
+    }
+    .marquee-content img:hover {
+      opacity: 1;
+      filter: grayscale(0);
+    }
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
 
-.marquee-images {
-  display: flex;
-  animation: scroll 20s linear infinite;
-  gap: 30px;
-}
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
+    .cat-item {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+    .cat-item:hover {
+      transform: translateY(-10px);
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+    .cat-item h3 { font-size: 1.5rem; margin-top: 15px; }
 
-.marquee-images img {
-  height: 300px;
-  width: auto;
-  object-fit: contain;
-}
-
-/* Scroll animation */
-@keyframes scroll {
-  0% {
-    transform: translateX(100%)
-  }
-  100% {
-    transform: translateX(-100%)
-  }
-}
-
+    .featured-section {
+      padding: 100px 20px;
+      background: var(--bg-darker);
+    }
+    .internship-card {
+      background: var(--glass);
+      padding: 32px;
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+      transition: var(--transition);
+    }
+    .internship-card:hover {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body>
-  <div class="marquee-container">
-  <div class="marquee-images">
-    <img src="/images/intern1.jpg" alt="Internship 1">
-    <img src="/images/intern2.jpg" alt="Internship 2">
-    <img src="/images/intern3.jpg" alt="Internship 3">
-    <img src="/images/intern4.jpg" alt="Internship 4">
-    <img src="/images/intern5.jpg" alt="Internship 5">
-  
-  </div> 
-  </div>
+
+  <!-- Navbar -->
+  <nav style="display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 100;">
+    <div class="logo" style="display: flex; align-items: center; gap: 10px; font-size: 1.5rem; font-weight: bold; color: white;">
+      <!-- Logo SVG -->
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#paint0_linear)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="paint0_linear" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#6366f1"/>
+            <stop offset="1" stop-color="#a855f7"/>
+          </linearGradient>
+        </defs>
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+      </svg>
+      Skill Record
+    </div>
+    <div class="nav-links" style="display: flex; gap: 20px;">
+      <a href="/student/login" style="color: white; text-decoration: none; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">Student Login</a>
+      <a href="/faculty/login" style="color: white; text-decoration: none; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">Faculty Login</a>
+    </div>
+  </nav>
 
   <!-- Hero Section -->
   <header class="hero">
     <div class="hero-content">
-      <h1>Launch Your Dream with Skill Record</h1>
-      <p>Find top internships and job opportunities crafted just for you.</p>
-      <a href="/Ssignup" class="cta-btn">Get Started as student </a>
-       <a href="/Fsignup" class="cta-btn">Get Started as faculty </a>
+      <h1>Launch Your Career with <span style="background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Skill Record</span></h1>
+      <p>The ultimate platform for students to track internships and for faculty to mentor growth.</p>
+      <div class="cta-group">
+        <a href="/student/login" class="cta-btn cta-btn-primary">Student Portal</a>
+        <a href="/faculty/login" class="cta-btn cta-btn-secondary">Faculty Portal</a>
+      </div>
     </div>
   </header>
 
-  <!-- Categories Panel -->
-  <section class="categories">
-  <div class="cat-card" onclick="location.href='/internships'">Internships</div>
-  <div class="cat-card" onclick="location.href='/jobs'">Jobs</div>
-  <div class="cat-card" onclick="location.href='/courses'">Courses</div>
-  <div class="cat-card" onclick="location.href='/certifications'">Certifications</div>
-</section>
-
-  <!-- Feature Cards Section -->
-  <section class="featured">
-  <h2>Popular Internships</h2>
-  <div class="cards-row">
-    <div class="feat-card" onclick="showDetails('webdev')">Web Dev Internship</div>
-    <div class="feat-card" onclick="showDetails('datasci')">Data Science Internship</div>
-    <div class="feat-card" onclick="showDetails('uiux')">UI/UX Internship</div>
-    <div class="feat-card" onclick="showDetails('marketing')">Marketing Internship</div>
-  </div>
-</section>
-
-<!-- Place to show detailed cards -->
-<div id="internship-details" class="cards-row"></div>
-
-
-  <footer style="background-color: #dbdee6; color: #0f0a0a; padding: 40px 20px; font-family: 'Segoe UI', sans-serif;">
-  <div style="display: flex; flex-wrap: wrap; justify-content: space-around; max-width: 1200px; margin: auto;">
-
-    <!-- Internships by Places -->
-    <div style="flex: 1 1 200px; margin: 10px;">
-      <h4>Internships by Places</h4>
-      <ul style="list-style: none; padding: 0;">
-        <li>India</li>
-        <li>Delhi</li>
-        <li>Bangalore</li>
-        <li>Hyderabad</li>
-        <li>Mumbai</li>
-        <li>Chennai</li>
-        <li>Gurgaon</li>
-        <li>Kolkata</li>
-        <li>Virtual</li>
-        <li>View all internships</li>
-      </ul>
+  <!-- Logo Marquee -->
+  <div class="marquee-container">
+    <div class="marquee-content">
+      <!-- Doubling for seamless scroll -->
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Apple_logo_black.svg" alt="Apple" style="filter: invert(1);">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix">
+      
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Apple_logo_black.svg" alt="Apple" style="filter: invert(1);">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix">
     </div>
-
-    <!-- Internships by Stream -->
-    <div style="flex: 1 1 200px; margin: 10px;">
-      <h4>Internships by Stream</h4>
-      <ul style="list-style: none; padding: 0;">
-        <li>Computer Science</li>
-        <li>Electronics</li>
-        <li>Mechanical</li>
-        <li>Civil</li>
-        <li>Marketing</li>
-        <li>Finance</li>
-        <li>Chemical</li>
-        <li>Research Fellowship</li>
-        <li>Campus Ambassador</li>
-        <li>View all</li>
-      </ul>
-    </div>
-
-    <!-- Courses -->
-    <div style="flex: 1 1 200px; margin: 10px;">
-      <h4>Certification Courses</h4>
-      <ul style="list-style: none; padding: 0;">
-        <li>Full Stack Development</li>
-        <li>Data Science</li>
-        <li>UI/UX Design</li>
-        <li>Digital Marketing</li>
-        <li>Product Management</li>
-        <li>EV Technology</li>
-        <li>Finance Modeling</li>
-        <li>HR Management</li>
-        <li>Supply Chain</li>
-      </ul>
-    </div>
-
-    <!-- Jobs -->
-    <div style="flex: 1 1 200px; margin: 10px;">
-      <h4>Jobs by Category</h4>
-      <ul style="list-style: none; padding: 0;">
-        <li>Delhi</li>
-        <li>Mumbai</li>
-        <li>Bangalore</li>
-        <li>Kolkata</li>
-        <li>Chennai</li>
-        <li>Web Dev</li>
-        <li>Marketing</li>
-        <li>Finance</li>
-        <li>Graphic Design</li>
-      </ul>
-    </div>
-
-    <!-- About Section -->
-    <div style="flex: 1 1 200px; margin: 10px;">
-      <h4>About SkillRecord</h4>
-      <ul style="list-style: none; padding: 0;">
-        <li>About us</li>
-        <li>We're hiring</li>
-        <li>Hire interns</li>
-        <li>Post a Job</li>
-        <li>Terms & Conditions</li>
-        <li>Privacy Policy</li>
-        <li>Contact</li>
-        <li>Sitemap</li>
-      </ul>
-    </div>
-
   </div>
 
-  <div style="background: white; text-align: center; padding: 25px 10px; border-top: 1px solid #f6f4fc; margin-top: 30px;">
-  <p style="font-size: 18px; font-weight: bold; margin: 8px 0;">© 2025 SkillRecord</p>
-  <p style="font-size: 16px; font-weight: bold; margin: 5px 0;">Email: skillrecord@gmail.com</p>
-</div>
-</footer>
-<script>
- 
-  function showDetails(type) {
-    const details = {
-      webdev: `
-        <div class="feat-card">
-          <h3>Full Stack Developer</h3>
-          <p><strong>Company:</strong> CodeCraft</p>
-          <p><strong>Duration:</strong> 3 Months</p>
-          <p><strong>Location:</strong> Remote</p>
-          <p><strong>Stipend:</strong> ₹5,000/month</p>
-        </div>
-        <div class="feat-card">
-          <h3>Frontend Developer</h3>
-          <p><strong>Company:</strong> DevSphere</p>
-          <p><strong>Duration:</strong> 2 Months</p>
-          <p><strong>Location:</strong> Delhi</p>
-          <p><strong>Stipend:</strong> ₹4,000/month</p>
-        </div>
-      `,
-      datasci: `
-        <div class="feat-card">
-          <h3>Data Analyst Intern</h3>
-          <p><strong>Company:</strong> DataBridge</p>
-          <p><strong>Duration:</strong> 6 Months</p>
-          <p><strong>Location:</strong> Bangalore</p>
-          <p><strong>Stipend:</strong> ₹8,000/month</p>
-        </div>
-        <div class="feat-card">
-          <h3>Machine Learning Intern</h3>
-          <p><strong>Company:</strong> MLX Labs</p>
-          <p><strong>Duration:</strong> 3 Months</p>
-          <p><strong>Location:</strong> Remote</p>
-          <p><strong>Stipend:</strong> ₹7,000/month</p>
-        </div>
-      `,
-      uiux: `
-        <div class="feat-card">
-          <h3>UI/UX Designer</h3>
-          <p><strong>Company:</strong> DesignWave</p>
-          <p><strong>Duration:</strong> 2 Months</p>
-          <p><strong>Location:</strong> Mumbai</p>
-          <p><strong>Stipend:</strong> ₹4,500/month</p>
-        </div>
-      `,
-      marketing: `
-        <div class="feat-card">
-          <h3>Marketing Intern</h3>
-          <p><strong>Company:</strong> BrandBoost</p>
-          <p><strong>Duration:</strong> 3 Months</p>
-          <p><strong>Location:</strong> Delhi</p>
-          <p><strong>Stipend:</strong> ₹6,000/month</p>
-        </div>
-        <div class="feat-card">
-          <h3>Content Marketing Intern</h3>
-          <p><strong>Company:</strong> WriteRight</p>
-          <p><strong>Duration:</strong> 1 Month</p>
-          <p><strong>Location:</strong> Remote</p>
-          <p><strong>Stipend:</strong> ₹3,000/month</p>
-        </div>
-      `
-    };
+  <!-- Categories -->
+  <section class="categories-grid">
+    <div class="cat-item" onclick="location.href='/internships'">
+      <h3>Internships</h3>
+      <p>Real-world experience</p>
+    </div>
+    <div class="cat-item" onclick="location.href='/jobs'">
+      <h3>Full-time Jobs</h3>
+      <p>Start your career</p>
+    </div>
+    <div class="cat-item" onclick="location.href='/courses'">
+      <h3>Skill Courses</h3>
+      <p>Upskill on demand</p>
+    </div>
+    <div class="cat-item" onclick="location.href='/certifications'">
+      <h3>Certifications</h3>
+      <p>Get recognized</p>
+    </div>
+  </section>
 
-    document.getElementById('internship-details').innerHTML = details[type];
-  }
-</script>
+  <!-- Featured -->
+  <section class="featured-section">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <h2 style="font-size: 2.5rem; margin-bottom: 40px; text-align: center;">Popular Opportunities</h2>
+      <div id="internship-details" class="categories-grid" style="margin-top: 0;">
+        <div class="internship-card">
+          <h4>Software Engineering</h4>
+          <p style="color: var(--accent);">CodeCraft Inc.</p>
+          <div style="margin-top: 20px; font-size: 0.9rem; color: var(--text-muted);">
+            <span>Remote</span> • <span>3 Months</span>
+          </div>
+        </div>
+        <div class="internship-card">
+          <h4>Data Analytics</h4>
+          <p style="color: var(--accent);">DataBridge</p>
+          <div style="margin-top: 20px; font-size: 0.9rem; color: var(--text-muted);">
+            <span>Bangalore</span> • <span>6 Months</span>
+          </div>
+        </div>
+        <div class="internship-card">
+          <h4>UI/UX Design</h4>
+          <p style="color: var(--accent);">DesignWave</p>
+          <div style="margin-top: 20px; font-size: 0.9rem; color: var(--text-muted);">
+            <span>Mumbai</span> • <span>2 Months</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="padding: 100px 20px; background: #020617; border-top: 1px solid var(--glass-border);">
+    <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+          <!-- Logo SVG -->
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#paint0_linear_footer)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <defs>
+              <linearGradient id="paint0_linear_footer" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6366f1"/>
+                <stop offset="1" stop-color="#a855f7"/>
+              </linearGradient>
+            </defs>
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+          <h4 style="color: white; font-size: 1.5rem; margin: 0;">Skill Record</h4>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Building the future of internship tracking and career growth.</p>
+      </div>
+      <div>
+        <h4 style="color: white; margin-bottom: 20px;">Quick Links</h4>
+        <ul style="list-style: none; color: var(--text-muted); font-size: 0.9rem; line-height: 2;">
+          <li>About Us</li>
+          <li>Careers</li>
+          <li>Contact</li>
+          <li>Privacy Policy</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color: white; margin-bottom: 20px;">Categories</h4>
+        <ul style="list-style: none; color: var(--text-muted); font-size: 0.9rem; line-height: 2;">
+          <li>Full Stack Development</li>
+          <li>Data Science</li>
+          <li>Digital Marketing</li>
+          <li>UI/UX Design</li>
+        </ul>
+      </div>
+    </div>
+    <div style="text-align: center; margin-top: 60px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.8rem;">
+      © 2025 SkillRecord. All rights reserved.
+    </div>
+  </footer>
 
 </body>
 </html>

@@ -1,73 +1,86 @@
-const {student,studentSchema } = require("../models/studentSchema");
-const{Log,logSchema}=require("../models/log")
-const multer = require('multer');
+const { student, studentSchema } = require("../models/studentSchema");
+const { Log, logSchema } = require("../models/log");
+const { Notification } = require("../models/notification");
+const { faculty } = require("../models/facultySchema");
+const bcrypt = require('bcrypt');
 
 //<=======================rendering of pages==============================>
-exports.getHomepage=(req,res)=>
-{
+exports.getHomepage = (req, res) => {
     res.render('home');
 }
-exports.terms=(req,res)=>{
+exports.terms = (req, res) => {
     res.render('terms')
 }
 
-exports.Studentsignuppage=(req,res)=>{
-    res.render('Studentsignup',{message:""})
+exports.Studentsignuppage = (req, res) => {
+    res.render('Studentsignup', { message: "" })
 }
 
-exports.Studentloginpage=(req,res)=>{
-    res.render('Slogin',{message:""});
+exports.Studentloginpage = (req, res) => {
+    res.render('Slogin', { message: "" });
 }
-
-
-
 
 //<=========================LOGIC for routes ============================>
 
 //<=======================SIGNUP PAGE=========================================>
-exports.signupform=async(req,res)=>{
-    const {firstname,lastname,email,password,rollno,course,department }=req.body
-    if(firstname||lastname||email||password||rollno||course || department )
-    {
+exports.signupform = async (req, res) => {
+    const { firstname, lastname, email, password, rollno, course, department } = req.body
+    if (firstname && lastname && email && password && rollno && course && department) {
+        try {
+            // Check if student already exists
+            const existingStudent = await student.findOne({ $or: [{ email }, { rollno }] });
+            if (existingStudent) {
+                return res.render('Studentsignup', { message: "Student with this email or roll number already exists" });
+            }
 
-     try
-         {
-            const newstudent=new student({firstname,lastname,email,password,course,rollno,department})
+            // Hash password
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const newstudent = new student({ 
+                firstname, 
+                lastname, 
+                email, 
+                password: hashedPassword, 
+                course, 
+                rollno, 
+                department 
+            })
             await newstudent.save()
-           return  res.render('Slogin',{message:"student signed up "})
-         }
-    catch(err)
-        {
-           console.log("error in signup",err)
+            return res.render('Slogin', { message: "Student signed up successfully. Please log in." })
         }
-         
+        catch (err) {
+            console.log("error in signup", err)
+            return res.render('Studentsignup', { message: "Error in signup. Please try again." })
+        }
     }
-    return res.render('Studentsignup',{message:"all fields required"})
+    return res.render('Studentsignup', { message: "All fields are required" })
 }
 
-
 //<==============================LOGIN PAGE=============================>
-exports.loginform=async(req,res)=>{
-    const {rollno,email,password,}=req.body;
-    if(rollno|| email || password)
-    {
-        try
-        {
-        const learner=await student.findOne({rollno,email,password});
-        console.log(learner)
-        if(!learner)
-        {
-           return res.status(404).render('Slogin',{message:"invalid credentials"})
-        }
-        req.session.rollno=learner.rollno;
-        req.session.email=learner.email;
-        return res.redirect('/student/dashboard');
-        }
-        catch(err)
-        {
-            res.render('Slogin',{message:"Internal server error"})
-        }
+exports.loginform = async (req, res) => {
+    const { rollno, email, password } = req.body;
+    if (rollno && email && password) {
+        try {
+            const learner = await student.findOne({ rollno, email });
+            if (!learner) {
+                return res.status(404).render('Slogin', { message: "Invalid credentials" })
+            }
 
+            // Compare hashed password
+            const isMatch = await bcrypt.compare(password, learner.password);
+            if (!isMatch) {
+                return res.status(401).render('Slogin', { message: "Invalid credentials" });
+            }
+
+            req.session.rollno = learner.rollno;
+            req.session.email = learner.email;
+            return res.redirect('/student/dashboard');
+        }
+        catch (err) {
+            console.error(err);
+            res.render('Slogin', { message: "Internal server error" })
+        }
+    } else {
+        res.render('Slogin', { message: "All fields are required" })
     }
 }
 
@@ -85,20 +98,33 @@ exports.loginform=async(req,res)=>{
 
 //<======student dashboard===========>
 exports.studentdashboard = async (req, res) => {
-    const studentData = await student.findOne({
-        rollno: req.session.rollno,
-        email: req.session.email
-    });
-    const logs = await Log.find({ studentId: studentData._id }).sort({ week: 1 });
+    try {
+        const studentData = await student.findOne({
+            rollno: req.session.rollno,
+            email: req.session.email
+        });
 
-    const message = req.session.message;
-  delete req.session.message;
+        if (!studentData) {
+            req.session.destroy();
+            return res.redirect('/student/login');
+        }
 
-    return res.render('studentdashboard', {
-        student: studentData,
-        logs,
-        message
-    });
+        const logs = await Log.find({ studentId: studentData._id }).sort({ week: 1 });
+        const notifications = await Notification.find({ userId: studentData._id, userType: 'Student' }).sort({ createdAt: -1 });
+
+        const message = req.session.message;
+        delete req.session.message;
+
+        return res.render('studentdashboard', {
+            student: studentData,
+            logs,
+            notifications,
+            message
+        });
+    } catch (err) {
+        console.error("Dashboard error:", err);
+        res.status(500).send("Error loading dashboard");
+    }
 };
 
 //<=======student submit log=========>
@@ -112,7 +138,7 @@ exports.submitLog=async(req,res)=>{
 
     if(!studentData)
     {
-        return res.redirect('/Slogin')
+        return res.redirect('/student/login')
     }
 
     const newLog=new Log({
@@ -124,6 +150,17 @@ exports.submitLog=async(req,res)=>{
 
     await newLog.save();
 
+    const faculties = await faculty.find({ department: studentData.department });
+    const notifications = faculties.map(f => ({
+        userId: f._id,
+        userType: 'Faculty',
+        message: `Student ${studentData.firstname} ${studentData.lastname} uploaded a new report for Week ${week}.`
+    }));
+    if (notifications.length > 0) {
+        await Notification.insertMany(notifications);
+    }
+
+    req.session.message = "Report submitted successfully!";
     return res.redirect('/student/dashboard')
 }
 
@@ -134,7 +171,7 @@ exports.submitLog=async(req,res)=>{
             console.log(err);
             return res.status(500).send("Logout failed");
         }
-        res.redirect('/Slogin');  // Logout ke baad login page pe bhej do
+        res.redirect('/student/login');
     });
  }
 
@@ -190,6 +227,38 @@ exports.deleteLog = async(req, res) => {
     } catch (err) {
         console.error(err);
         res.send('Error deleting log');
+    }
+};
+
+//<=========================CHANGE PASSWORD================================>
+exports.changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const studentData = await student.findOne({
+            rollno: req.session.rollno,
+            email: req.session.email
+        });
+
+        if (!studentData) {
+            return res.redirect('/student/login');
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, studentData.password);
+        if (!isMatch) {
+            req.session.message = 'Incorrect current password!';
+            return res.redirect('/student/dashboard');
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        studentData.password = hashedNewPassword;
+        await studentData.save();
+
+        req.session.message = 'Password changed successfully!';
+        res.redirect('/student/dashboard');
+    } catch (err) {
+        console.error('Error changing password:', err);
+        req.session.message = 'Error changing password!';
+        res.redirect('/student/dashboard');
     }
 };
 

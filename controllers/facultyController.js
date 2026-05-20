@@ -2,6 +2,7 @@ const{faculty}=require("../models/facultySchema");
 const bcrypt = require('bcrypt');
 const { student } = require('../models/studentSchema');
 const { Log } = require('../models/log');
+const { Notification } = require("../models/notification");
 
 //<================================RENDERING OF PAGES==============================>
 exports.facultysignuppage=(req,res)=>
@@ -78,61 +79,126 @@ exports.Floginform = async (req, res) => {
     }
 };
 
+exports.changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const staff = await faculty.findOne({ email: req.session.email });
 
+        if (!staff) {
+            return res.redirect('/faculty/login');
+        }
 
+        const isMatch = await bcrypt.compare(currentPassword, staff.password);
+        if (!isMatch) {
+            req.session.message = 'Incorrect current password!';
+            return res.redirect('/faculty/dashboard');
+        }
 
-exports.facultydashboard = async (req, res) => {
-    if (!req.session.email) {
-        return res.redirect('/Flogin');
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        staff.password = hashedNewPassword;
+        await staff.save();
+
+        req.session.message = 'Password changed successfully!';
+        res.redirect('/faculty/dashboard');
+    } catch (err) {
+        console.error('Error changing password:', err);
+        req.session.message = 'Error changing password!';
+        res.redirect('/faculty/dashboard');
     }
+};
+exports.facultydashboard = async (req, res) => {
+    try {
+        const staff = await faculty.findOne({ email: req.session.email });
+        if (!staff) {
+            req.session.destroy();
+            return res.redirect('/faculty/login');
+        }
 
-    const staff = await faculty.findOne({ email: req.session.email });
-    console.log(staff)
+        // 🟢 Step 1: Get all students in the faculty’s department
+        const studentsInDept = await student.find({ 
+            department: staff.department ? staff.department.trim() : "" 
+        });
 
-    // 🟢 Step 1: Get all students in the faculty’s department
-    const studentsInDept = await student.find({ department: staff.department.trim() });
-    console.log("Students in Dept:", studentsInDept);
+        const studentIds = studentsInDept.map(s => s._id);
 
-    const studentIds = studentsInDept.map(s => s._id);
+        // 🟢 Step 2: Get logs only for those students and populate student info
+        const logs = await Log.find({ studentId: { $in: studentIds } }).populate('studentId');
 
-    // 🟢 Step 2: Get logs only for those students and populate student info
-    const logs = await Log.find({ studentId: { $in: studentIds } }).populate('studentId');
+        // 🟢 Step 3: Format logs Safely
+        const studentLogs = logs
+            .filter(log => log.studentId) // Ensure studentId is populated
+            .map(log => ({
+                _id: log._id,
+                name: (log.studentId.firstname || "") + " " + (log.studentId.lastname || ""),
+                date: log.date ? log.date.toLocaleDateString() : "N/A",
+                log: log.description,
+                status: log.status,
+                file: log.file
+            }));
 
-    console.log("Logs found:", logs);
+        // 🟢 Step 4: Fetch Notifications
+        const notifications = await Notification.find({ userId: staff._id, userType: 'Faculty' }).sort({ createdAt: -1 });
 
-    // 🟢 Step 3: Format logs to pass student name etc.
-    const studentLogs = logs.map(log => ({
-        _id: log._id,
-        name: log.studentId.firstname + " " + log.studentId.lastname,
-        date: log.date.toLocaleDateString(),
-        log: log.description,
-        status: log.status,
-        file: log.file
-    }));
+        const message = req.session.message;
+        delete req.session.message;
 
-    res.render('facultydashboard', {
-        staff,
-        students: studentLogs
-    });
+        res.render('facultydashboard', {
+            staff,
+            students: studentLogs,
+            notifications,
+            message
+        });
+    } catch (err) {
+        console.error("Faculty dashboard error:", err);
+        res.status(500).send("Error loading dashboard");
+    }
 };
 
 
 exports.approveLog = async (req, res) => {
-    await Log.findByIdAndUpdate(req.params.id, { status: 'Approved' });
+    try {
+        const log = await Log.findByIdAndUpdate(req.params.id, { status: 'Approved' });
+        if (log && log.studentId) {
+            const notification = new Notification({
+                userId: log.studentId,
+                userType: 'Student',
+                message: `Your report for Week ${log.week} has been Approved.`
+            });
+            await notification.save();
+        }
+        req.session.message = 'Report approved successfully!';
+    } catch (err) {
+        console.error("Error approving log:", err);
+        req.session.message = 'Error approving report.';
+    }
     res.redirect('/faculty/dashboard');
 };
 
 exports.rejectLog = async (req, res) => {
-    await Log.findByIdAndUpdate(req.params.id, { status: 'Rejected' });
+    try {
+        const log = await Log.findByIdAndUpdate(req.params.id, { status: 'Rejected' });
+        if (log && log.studentId) {
+            const notification = new Notification({
+                userId: log.studentId,
+                userType: 'Student',
+                message: `Your report for Week ${log.week} has been Rejected.`
+            });
+            await notification.save();
+        }
+        req.session.message = 'Report rejected successfully!';
+    } catch (err) {
+        console.error("Error rejecting log:", err);
+        req.session.message = 'Error rejecting report.';
+    }
     res.redirect('/faculty/dashboard');
 };
 exports.facultyLogout = (req, res) => {
     req.session.destroy(err => {
         if (err) {
             console.log("Logout error:", err);
-            return res.redirect('/facultydashboard');
+            return res.redirect('/faculty/dashboard');
         }
-        res.render('Flogin',{message:"Logout successfully"});  // Login page pe bhej do logout ke baad
+        res.redirect('/faculty/login');
     });
 };
 

@@ -1,30 +1,36 @@
-const express=require('express');
-const app=express();
-const index=require('./routes/index');
-const path=require('path')
-const mongoose=require('mongoose');
-const connectDB=require("./config/db");
-const { connect} = require('http2');
-const { Session } = require('inspector/promises');
+require('dotenv').config();
+const express = require('express');
+const app = express();
+const studentRoutes = require('./routes/studentRoutes');
+const facultyRoutes = require('./routes/facultyRoutes');
+const homeRoutes = require('./routes/homeRoutes');
+const path = require('path');
+const connectDB = require("./config/db");
 const session = require('express-session');
+
 connectDB();
 
-app.use(express.static(path.join(__dirname,'public')))
-app.use(express.static('public'))
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static('uploads'));
-app.use(express.urlencoded({extended:true}));
-app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 app.use(session({
-    secret:'myfavkey',
-    resave:false,
-    saveUninitialized:true,
-    cookie:{
-       maxAge:1000*60*60
+    secret: process.env.SESSION_SECRET || 'fallback_secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 1000 * 60 * 60
     }
 }));
 
-app.set('view engine','ejs');
+app.set('view engine', 'ejs');
 
-app.use('/',index);
+app.use('/', homeRoutes);
+app.use('/student', studentRoutes);
+app.use('/faculty', facultyRoutes);
 
-app.listen(3300,()=>{console.log("Server is running")})
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
+});

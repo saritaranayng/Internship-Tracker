@@ -3,121 +3,93 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Faculty Login</title>
+  <title>Faculty Login | Skill Record</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    * {
-      box-sizing: border-box;
+    .password-container {
+      position: relative;
     }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #e0eafc, #cfdef3);
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    main {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .form-box {
-      background: #fff;
-      padding: 30px 35px;
-      border-radius: 10px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-      width: 350px;
-    }
-
-    .form-box h1 {
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    label {
-      font-size: 15px;
-      margin-bottom: 6px;
-      display: block;
-      color: #333;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 16px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      transition: border 0.3s ease;
-    }
-
-    input:focus {
-      border-color: #007bff;
-      outline: none;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      font-size: 15px;
-      background-color: #007bff;
-      border: none;
-      color: white;
-      border-radius: 5px;
+    .toggle-password {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
       cursor: pointer;
-      transition: background 0.3s ease;
-      margin-bottom: 10px;
+      color: var(--text-muted);
+      transition: var(--transition);
     }
-
-    button:hover {
-      background-color: #0056b3;
+    .toggle-password:hover {
+      color: white;
     }
-
-    .back-button {
-      background-color: #6c757d;
-    }
-
-    .back-button:hover {
-      background-color: #5a6268;
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 20px;
     }
   </style>
 </head>
-<body>
+<body class="auth-page">
 
-  <main>
-    <div class="form-box">
-      <form action="/Flogin" method="POST">
-        <h1>Faculty Login Portal</h1>
-        
-        <label for="department">Department:</label>
-        <input type="text" id="department" name="department" required>
+  <div class="auth-card">
+    <form action="/faculty/login" method="POST">
+      <h2>Faculty Login</h2>
+      <h3>Access the mentor dashboard and track student progress</h3>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+      <div class="form-group">
+        <label for="department">Department</label>
+        <select id="department" name="department" class="form-control" required>
+          <option value="" disabled selected>Select Department</option>
+          <option value="Computer Application">Computer Application</option>
+          <option value="Management">Management</option>
+        </select>
+      </div>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+      <div class="form-group">
+        <label for="email">Work Email</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="faculty@college.edu" required>
+      </div>
 
-        <button type="submit">LOG IN</button>
-        <button type="button" class="back-button" onclick="window.location.href='/'">Back</button>
-      </form>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-container">
+          <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+          <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('password', this)"></i>
+        </div>
+      </div>
 
-      <% if(message && message.length > 0) { %>
-        <script>alert("<%= message %>")</script>
-      <% } %>
-    </div>
-  </main>
+      <button type="submit" class="auth-btn">Sign In</button>
+      
+      <div class="auth-footer">
+        New faculty member? <a href="/faculty/signup">Register here</a>
+      </div>
+      
+      <a href="/" class="back-link">← Back to Home</a>
+    </form>
 
- <!-- Footer -->
-  <%- include('partials/footer') %>
+    <% if(message && message.length > 0){ %>
+      <div style="margin-top: 20px; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; color: #ef4444; font-size: 0.875rem; text-align: center;">
+        <%= message %>
+      </div>
+    <% } %>
+  </div>
+
+  <script>
+    function togglePassword(inputId, icon) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+  </script>
 
 </body>
 </html>

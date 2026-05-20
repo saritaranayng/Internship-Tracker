@@ -1,45 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title><%= title %></title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %> | Skill Record</title>
+  <link rel="stylesheet" href="/css/style.css">
   <style>
-    body {
-      font-family: Arial;
-      padding: 20px;
+    .featured-section {
+      padding: 100px 20px;
+      background: var(--bg-darker);
+      min-height: 100vh;
     }
-    h1 {
-      text-align: center;
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
-    .card-container {
+    .internship-card {
+      background: var(--glass);
+      padding: 32px;
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+      transition: var(--transition);
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
+      flex-direction: column;
     }
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 20px;
-      width: 250px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      background: white;
+    .internship-card:hover {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      transform: translateY(-5px);
     }
-    .card h3 {
-      margin-top: 0;
+    .card-apply-btn {
+      margin-top: auto;
+      display: inline-block;
+      text-align: center;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+      margin-top: 25px;
+    }
+    .card-apply-btn:hover {
+      box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
     }
   </style>
 </head>
 <body>
-  <h1><%= title %></h1>
-  <div class="card-container">
-    <% items.forEach(item => { %>
-      <div class="card">
-        <h3><%= item.title %></h3>
-        <p><%= item.description %></p>
-        <% if (item.duration) { %><p><strong>Duration:</strong> <%= item.duration %></p><% } %>
-        <% if (item.location) { %><p><strong>Location:</strong> <%= item.location %></p><% } %>
+
+  <!-- Navbar -->
+  <nav style="display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 100;">
+    <div class="logo" style="display: flex; align-items: center; gap: 10px; font-size: 1.5rem; font-weight: bold; color: white; cursor: pointer;" onclick="location.href='/'">
+      <!-- Logo SVG -->
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="url(#paint0_linear)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="paint0_linear" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#6366f1"/>
+            <stop offset="1" stop-color="#a855f7"/>
+          </linearGradient>
+        </defs>
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+      </svg>
+      Skill Record
+    </div>
+    <div class="nav-links" style="display: flex; gap: 20px;">
+      <a href="/" style="color: white; text-decoration: none; font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">Home</a>
+    </div>
+  </nav>
+
+  <section class="featured-section">
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center; margin-bottom: 60px;">
+      <h1 style="font-size: 3rem; background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;"><%= title %> Opportunities</h1>
+      <p style="color: var(--text-muted); font-size: 1.2rem; margin-top: 15px;">Discover dynamic <%= title.toLowerCase() %> fetched dynamically across top platforms.</p>
+    </div>
+
+    <div class="categories-grid">
+      <% items.forEach(item => { %>
+        <div class="internship-card">
+          <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: white;"><%= item.title %></h3>
+          <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; margin-bottom: 20px;"><%= item.description %></p>
+          
+          <div style="display: flex; gap: 15px; font-size: 0.9rem; color: var(--accent); margin-bottom: 10px; flex-wrap: wrap;">
+            <% if (item.duration) { %>
+              <span style="background: rgba(99, 102, 241, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(99, 102, 241, 0.2);">🕒 <%= item.duration %></span>
+            <% } %>
+            <% if (item.location) { %>
+              <span style="background: rgba(168, 85, 247, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(168, 85, 247, 0.2);">📍 <%= item.location %></span>
+            <% } %>
+          </div>
+
+          <a href="<%= item.link %>" target="_blank" rel="noopener noreferrer" class="card-apply-btn">
+            View on <%= item.platform %> ↗
+          </a>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+
+  <footer style="padding: 60px 20px; background: #020617; border-top: 1px solid var(--glass-border);">
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="url(#paint0_linear_footer)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <defs>
+            <linearGradient id="paint0_linear_footer" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#6366f1"/>
+              <stop offset="1" stop-color="#a855f7"/>
+            </linearGradient>
+          </defs>
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+        </svg>
+        <span style="font-size: 1.1rem; font-weight: 600; color: white;">Skill Record</span>
       </div>
-    <% }) %>
-  </div>
+      <p style="font-size: 0.9rem; color: var(--text-muted);">© 2025 Skill Record. Connecting Students with Opportunities.</p>
+    </div>
+  </footer>
+
 </body>
 </html>

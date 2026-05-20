@@ -8,7 +8,11 @@ exports.viewInternships = (req, res) => {
     { title: "App Development", description: "Build cross-platform apps", duration: "1.5 months" },
     { title: "IoT Internship", description: "Work on real-time sensor data", duration: "3 months" },
     { title: "UI/UX Design", description: "Create user-friendly interfaces", duration: "2 months" },
-  ];
+  ].map(item => ({
+    ...item,
+    platform: "Internshala",
+    link: `https://internshala.com/internships/keywords-${encodeURIComponent(item.title.toLowerCase())}`
+  }));
   res.render('categoryCards', { title: 'Internships', items: internships });
 };
 
@@ -20,7 +24,11 @@ exports.viewJobs = (req, res) => {
     { title: "QA Tester", description: "Automated and manual testing", location: "Hyderabad" },
     { title: "System Analyst", description: "Client requirement analysis", location: "Mumbai" },
     { title: "Cloud Engineer", description: "Deploying scalable solutions", location: "Remote" },
-  ];
+  ].map(item => ({
+    ...item,
+    platform: "LinkedIn",
+    link: `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(item.title)}`
+  }));
   res.render('categoryCards', { title: 'Jobs', items: jobs });
 };
 
@@ -32,7 +40,11 @@ exports.viewCourses = (req, res) => {
     { title: "UI/UX Bootcamp", description: "Figma, Wireframes", duration: "2 months" },
     { title: "DSA Mastery", description: "With C++/Java", duration: "3 months" },
     { title: "Cloud Fundamentals", description: "Azure, AWS basics", duration: "2 months" },
-  ];
+  ].map(item => ({
+    ...item,
+    platform: "Udemy",
+    link: `https://www.udemy.com/courses/search/?q=${encodeURIComponent(item.title)}`
+  }));
   res.render('categoryCards', { title: 'Courses', items: courses });
 };
 
@@ -44,6 +56,10 @@ exports.viewCertifications = (req, res) => {
     { title: "AI & ML", description: "Coursera verified", duration: "2 months" },
     { title: "DSA in Java", description: "Self-paced coding program", duration: "3 months" },
     { title: "Digital Marketing", description: "SEO, SEM, Google Ads", duration: "1.5 months" },
-  ];
+  ].map(item => ({
+    ...item,
+    platform: "Coursera",
+    link: `https://www.coursera.org/search?query=${encodeURIComponent(item.title)}`
+  }));
   res.render('categoryCards', { title: 'Certifications', items: certs });
 };

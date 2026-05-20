@@ -1,57 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-<link rel="stylesheet" href="/css/style.css">    
-               
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Registration | Skill Record</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .password-container {
+      position: relative;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+    .toggle-password:hover {
+      color: white;
+    }
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 20px;
+    }
+  </style>
 </head>
-<body>
-  <div class="signup-page">
-    <div class="signup-card">
-        <h2> FREE SIGN UP FOR STUDENTS</h2>
-        <h3>1500+ companies are hiring on Skill Record</h3>
-        <form action="/signup" method="POST">
-            <label>Email</label><br>
-            <input type="email" id="mail" name="email" placeholder="skillrecord@example.com" required>
-            <label>Password</label><br>
-            <input type="password" id="pwd" name="password" placeholder="Must be atleast 6 characters" required>
-            <div class="name-row">
-                <div class="field">
-                  <label for="fname">First Name</label>
-                  <input type="text" id="fname" name="firstname" placeholder="Sarita" required>
-                </div>
-                <div class="field">
-                  <label for="lname">Last Name</label>
-                  <input type="text" id="lname" name="lastname" placeholder="Rana" required>
-                </div>
-              </div>
-              <label for="department">Department:</label>
-               <input type="text" id="department" name="department" required><br>
-              <label>Course</label>
-              <input type="text" id="course" name="course" required>
-              <label>roll no</label>
-              <input type="text" id="Number" name="rollno" required>
-              
-            <!-- <label>First Name</label><br>
-            <input type="text" id="fname" placeholder="Sarita">
-            <label>Last Name</label>
-            <input type="text" id="lname" placeholder="Rana"><br> -->
-            <button type="button" onclick="window.location.href='/terms'">Terms and Conditions</button>
-            <button type="submit" id="btn">sign up</button>
-            <p>Already have an account ?
-            <button type="submit" id="btn2" onclick="window.location.href='/Slogin'">log In</button> </p>
-            <button type="button" onclick="window.location.href='/'">BACK</button>
-            <% if (message && message.length > 0) { %>
-          <script>
-            alert("<%= message %>");
-          </script>
-        <% } %>
-         </form>
-    
+<body class="auth-page">
 
-    <!-- Footer -->
-  <%- include('partials/footer') %>
+  <div class="auth-card" style="max-width: 600px;">
+    <form action="/student/signup" method="POST">
+      <h2>Create Student Account</h2>
+      <h3>Join 1500+ students tracking their career growth</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname">First Name</label>
+          <input type="text" id="fname" name="firstname" class="form-control" placeholder="John" required>
+        </div>
+        <div class="form-group">
+          <label for="lname">Last Name</label>
+          <input type="text" id="lname" name="lastname" class="form-control" placeholder="Doe" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="mail">Email Address</label>
+        <input type="email" id="mail" name="email" class="form-control" placeholder="john.doe@college.edu" required>
+      </div>
+
+      <div class="form-group">
+        <label for="pwd">Password</label>
+        <div class="password-container">
+          <input type="password" id="pwd" name="password" class="form-control" placeholder="Min. 6 characters" required minlength="6">
+          <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('pwd', this)"></i>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="roll">Roll Number</label>
+          <input type="text" id="roll" name="rollno" class="form-control" placeholder="123456" required>
+        </div>
+        <div class="form-group">
+          <label for="course">Course</label>
+          <select id="course" name="course" class="form-control" required>
+            <option value="" disabled selected>Select Course</option>
+            <option value="MCA">MCA</option>
+            <option value="MBA">MBA</option>
+            <option value="BCA">BCA</option>
+            <option value="BBA">BBA</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="department">Department</label>
+        <select id="department" name="department" class="form-control" required>
+          <option value="" disabled selected>Select Department</option>
+          <option value="Computer Application">Computer Application</option>
+          <option value="Management">Management</option>
+        </select>
+      </div>
+
+      <div style="margin-top: 10px; font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-bottom: 20px;">
+        By signing up, you agree to our <a href="/terms" style="color: var(--accent);">Terms and Conditions</a>.
+      </div>
+
+      <button type="submit" class="auth-btn">Register Account</button>
+      
+      <div class="auth-footer">
+        Already have an account? <a href="/student/login">Log In</a>
+      </div>
+      
+      <a href="/" class="back-link">← Back to Home</a>
+    </form>
+
+    <% if (message && message.length > 0) { %>
+      <div style="margin-top: 20px; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; color: #ef4444; font-size: 0.875rem; text-align: center;">
+        <%= message %>
+      </div>
+    <% } %>
+  </div>
+
+  <script>
+    function togglePassword(inputId, icon) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+  </script>
+
 </body>
 </html>

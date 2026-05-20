@@ -1,9 +1,16 @@
 function isStudentLoggedIn(req, res, next) {
     if (!req.session.rollno || !req.session.email) {
-        return res.redirect('/Slogin');  // Agar session nahi hai to login page bhej do
+        return res.redirect('/student/login'); // Updated to new path
     }
-    next();  // Agar session hai to aage badho
+    next();
 }
 
-module.exports = isStudentLoggedIn;
+function isFacultyLoggedIn(req, res, next) {
+    if (!req.session.email) {
+        return res.redirect('/faculty/login'); // Updated to new path
+    }
+    next();
+}
+
+module.exports = { isStudentLoggedIn, isFacultyLoggedIn };
 

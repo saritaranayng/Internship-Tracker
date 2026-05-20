@@ -7,7 +7,7 @@ const studentSchema=mongoose.Schema(
         lastname:String,
         course:String,
         department: String, 
-        rollno:{type:Number,minlength:6,unique:true} ,
+        rollno: { type: Number, required: true, unique: true },
         createdAt:{type:Date,default:Date.now}
     },
     {

@@ -2,196 +2,121 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Faculty Signup - Skill Record</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Faculty Registration | Skill Record</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* Overall Page Layout */
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #dfe9f3, #ffffff); /* light blue to white */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+    .password-container {
+      position: relative;
     }
-
-    /* Signup Page Wrapper */
-    .fsignup-page {
-      width: 100%;
-      max-width: 500px;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
-    /* Signup Card Styling */
-    .signup-card {
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      box-sizing: border-box;
-    }
-
-    /* Main Heading */
-    .heading {
-      text-align: center;
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: #2c3e50;
-      line-height: 1.4;
-      word-break: break-word;
-    }
-
-    /* Subheading */
-    .signup-card h3 {
-      text-align: center;
-      font-size: 14px;
-      color: #6c757d;
-      margin-bottom: 25px;
-    }
-
-    /* Form */
-    form {
-      display: flex;
-      flex-direction: column;
-    }
-
-    label {
-      font-size: 14px;
-      margin-bottom: 5px;
-      color: #333;
-      font-weight: 600;
-    }
-
-    /* Input Styling */
-    input {
-      padding: 10px 12px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-      background-color: #f9f9f9;
-      transition: border-color 0.3s ease;
-    }
-
-    input:focus {
-      border-color: #00ffe1;
-      outline: none;
-    }
-
-    /* Name Row */
-    .name-row {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-
-    .name-row .field {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Paragraph */
-    p {
-      text-align: center;
-      font-size: 14px;
-      color: #555;
-      margin: 10px 0;
-    }
-
-    /* Buttons */
-    button {
-      padding: 10px;
-      font-size: 15px;
-      border: none;
-      border-radius: 6px;
+    .toggle-password {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
       cursor: pointer;
-      font-weight: 600;
-      transition: background-color 0.3s ease;
+      color: var(--text-muted);
+      transition: var(--transition);
     }
-
-    /* Terms Button */
-    .terms-btn {
-      background: transparent;
-      
-     background-color: #0a7b7e;
-      margin-bottom: 10px;
+    .toggle-password:hover {
+      color: white;
     }
-
-    .signup-card button[type="button"] {
-      background-color: transparent;
-      border: 1.5px solid #0a7b7e;
-      color: #0a7b7e;
-    }
-
-    .terms-btn:hover,
-    .signup-card button[type="button"]:hover {
-      background-color: #0a7b7e;
-      color: #fff;
-    }
-
-    /* Submit and Login Buttons */
-    #btn,
-    #btn2 {
-      background-color: #0a7b7e;
-      color: #fff;
-      margin-bottom: 10px;
-      width: 100%;
-    }
-
-    #btn:hover,
-    #btn2:hover {
-      background-color: #0a7b7e;
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 20px;
     }
   </style>
 </head>
-<body>
-  <div class="fsignup-page">
-    <div class="signup-card">
-      <h2 class="heading">SIGN UP FOR FREE FOR FACULTY</h2>
-      <h3>1500+ companies are hiring on Skill Record</h3>
-      <form action="/signupf" method="POST">
-        <label>Email</label>
-        <input type="email" id="mail" name="email" placeholder="skillrecord@example.com" required />
-        
-        <label>Password</label>
-        <input type="password" id="pwd" name="password" placeholder="Must be at least 6 characters" required />
-        
-        <div class="name-row">
-          <div class="field">
-            <label for="fname">First Name</label>
-            <input type="text" id="fname" name="firstname" placeholder="Sarita" required />
-          </div>
-          <div class="field">
-            <label for="lname">Last Name</label>
-            <input type="text" id="lname" name="lastname" placeholder="Rana" required />
-          </div>
+<body class="auth-page">
+
+  <div class="auth-card" style="max-width: 600px;">
+    <form action="/faculty/signup" method="POST">
+      <h2>Mentor Registration</h2>
+      <h3>Help students bridge the gap between classroom and career</h3>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname">First Name</label>
+          <input type="text" id="fname" name="firstname" class="form-control" placeholder="Dr. Alice" required />
         </div>
+        <div class="form-group">
+          <label for="lname">Last Name</label>
+          <input type="text" id="lname" name="lastname" class="form-control" placeholder="Smith" required />
+        </div>
+      </div>
 
-        <label>Department</label>
-        <input type="text" id="depart" name="department" />
-        
-        <label>Designation</label>
-        <input type="text" id="des" name="designation" />
-        
-        <button type="button" class="terms-btn" onclick="window.location.href='/terms2'">Terms and Conditions</button>
-        <button type="submit" id="btn">Sign Up</button>
+      <div class="form-group">
+        <label for="mail">Work Email Address</label>
+        <input type="email" id="mail" name="email" class="form-control" placeholder="alice.smith@university.edu" required />
+      </div>
 
-        <p>Already have an account?</p>
-        <button type="button" id="btn2" onclick="window.location.href='/Flogin'">Log In</button>
-        <button type="button" onclick="window.location.href='/'">Back</button>
+      <div class="form-group">
+        <label for="pwd">Password</label>
+        <div class="password-container">
+          <input type="password" id="pwd" name="password" class="form-control" placeholder="Min. 6 characters" required minlength="6" />
+          <i class="fa-solid fa-eye toggle-password" onclick="togglePassword('pwd', this)"></i>
+        </div>
+      </div>
 
-        <% if (message && message.length > 0) { %>
-          <script>
-            alert("<%= message %>");
-          </script>
-        <% } %>
-      </form>
-    </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="depart">Department</label>
+          <select id="depart" name="department" class="form-control" required>
+            <option value="" disabled selected>Select Department</option>
+            <option value="Computer Application">Computer Application</option>
+            <option value="Management">Management</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="des">Designation</label>
+          <select id="des" name="designation" class="form-control" required>
+            <option value="" disabled selected>Select Designation</option>
+            <option value="Assistant Professor">Assistant Professor</option>
+            <option value="HOD">HOD</option>
+            <option value="Director">Director</option>
+            <option value="Class Coordinator">Class Coordinator</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top: 10px; font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-bottom: 20px;">
+        By joining, you agree to our <a href="/terms2" style="color: var(--accent);">Faculty Guidelines</a>.
+      </div>
+
+      <button type="submit" class="auth-btn">Join Faculty Network</button>
+      
+      <div class="auth-footer">
+        Already a member? <a href="/faculty/login">Log In</a>
+      </div>
+      
+      <a href="/" class="back-link">← Back to Home</a>
+    </form>
+
+    <% if (message && message.length > 0) { %>
+      <div style="margin-top: 20px; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; color: #ef4444; font-size: 0.875rem; text-align: center;">
+        <%= message %>
+      </div>
+    <% } %>
   </div>
+
+  <script>
+    function togglePassword(inputId, icon) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+  </script>
+
 </body>
 </html>
