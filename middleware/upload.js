@@ -1,10 +1,18 @@
 const multer = require('multer');
 const path = require('path');
+const os = require('os');
+const fs = require('fs');
+
+// Ensure temp upload directory exists (Vercel allows writing to /tmp)
+const tempDir = path.join(os.tmpdir(), 'uploads');
+if (!fs.existsSync(tempDir)){
+    fs.mkdirSync(tempDir, { recursive: true });
+}
 
 // Set storage engine
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Folder where files will be stored
+    cb(null, tempDir); // Store in temp directory
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' + file.originalname); // Unique filename
