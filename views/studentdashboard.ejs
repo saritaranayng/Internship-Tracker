@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard | Skill Record</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <style>
         .page-layout { display: flex; min-height: 100vh; }
         .sidebar { width: 250px; background: rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.1); padding: 20px; display: flex; flex-direction: column; }
@@ -274,7 +276,21 @@
     
     <% if (typeof message !== 'undefined' && message) { %>
       <script>
-        alert("<%= message %>");
+        document.addEventListener("DOMContentLoaded", function() {
+            const msg = "<%= message %>";
+            const isError = msg.toLowerCase().includes('error') || msg.toLowerCase().includes('incorrect') || msg.toLowerCase().includes('fail');
+            Toastify({
+                text: msg,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: isError ? "#ef4444" : "#10b981",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+                }
+            }).showToast();
+        });
       </script>
     <% } %>
 

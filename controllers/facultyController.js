@@ -71,8 +71,10 @@ exports.Floginform = async (req, res) => {
 
         req.session.email = staff.email;
 
-        return res.redirect('/faculty/dashboard');
-
+        req.session.save((err) => {
+            if (err) console.error("Session save error:", err);
+            return res.redirect('/faculty/dashboard');
+        });
     } catch (err) {
         console.error("Error in login:", err);
         return res.status(500).json({ message: "Internal server error" });

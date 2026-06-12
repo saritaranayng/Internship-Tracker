@@ -73,7 +73,14 @@ exports.loginform = async (req, res) => {
 
             req.session.rollno = learner.rollno;
             req.session.email = learner.email;
-            return res.redirect('/student/dashboard');
+            
+            req.session.save((err) => {
+                if (err) {
+                    console.error("Session save error:", err);
+                    return res.render('Slogin', { message: "Error saving session" });
+                }
+                return res.redirect('/student/dashboard');
+            });
         }
         catch (err) {
             console.error(err);
