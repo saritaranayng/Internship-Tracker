@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Faculty Login | Skill Record</title>
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     .password-container {
@@ -70,9 +72,23 @@
     </form>
 
     <% if(message && message.length > 0){ %>
-      <div style="margin-top: 20px; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; color: #ef4444; font-size: 0.875rem; text-align: center;">
-        <%= message %>
-      </div>
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const msg = "<%= message %>";
+            const isError = msg.toLowerCase().includes('error') || msg.toLowerCase().includes('invalid');
+            Toastify({
+                text: msg,
+                duration: 4000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: isError ? "#ef4444" : "#10b981",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+                }
+            }).showToast();
+        });
+      </script>
     <% } %>
   </div>
 
@@ -89,6 +105,29 @@
         icon.classList.add('fa-eye');
       }
     }
+  </script>
+
+  <!-- Global Loader -->
+  <div id="global-loader" class="loader-overlay">
+    <div class="spinner"></div>
+    <div class="loader-text">Processing...</div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const forms = document.querySelectorAll("form");
+      const loader = document.getElementById("global-loader");
+      
+      forms.forEach(form => {
+        form.addEventListener("submit", function() {
+          if (form.checkValidity()) {
+            loader.classList.add("active");
+            const buttons = form.querySelectorAll("button[type='submit']");
+            buttons.forEach(btn => btn.style.pointerEvents = 'none');
+          }
+        });
+      });
+    });
   </script>
 
 </body>

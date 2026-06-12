@@ -10,10 +10,19 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: 'internship_logs', // Folder name in your Cloudinary account
-    allowed_formats: ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'docx'],
-    resource_type: 'auto' // Important so PDFs are supported
+  params: async (req, file) => {
+    // Check if the file is an image
+    const isImage = file.mimetype.startsWith('image/');
+    
+    // Cloudinary needs the extension for raw files to set the right Content-Type
+    const ext = require('path').extname(file.originalname);
+    const baseName = file.originalname.replace(/\.[^/.]+$/, "");
+    
+    return {
+      folder: 'internship_logs',
+      resource_type: isImage ? 'image' : 'raw', 
+      public_id: isImage ? `${Date.now()}-${baseName}` : `${Date.now()}-${baseName}${ext}`
+    };
   },
 });
 

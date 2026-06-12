@@ -36,6 +36,12 @@ app.use('/', homeRoutes);
 app.use('/student', studentRoutes);
 app.use('/faculty', facultyRoutes);
 
+// Global Error Handler (so we can see 500 errors instead of crashing)
+app.use((err, req, res, next) => {
+    console.error("Global Error:", err);
+    res.status(500).send(`<h1>500 Internal Server Error</h1><p>${err.message}</p>`);
+});
+
 const PORT = process.env.PORT || 4000;
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {

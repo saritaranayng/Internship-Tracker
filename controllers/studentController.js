@@ -135,40 +135,44 @@ exports.studentdashboard = async (req, res) => {
 };
 
 //<=======student submit log=========>
-exports.submitLog=async(req,res)=>{
-    const {week,description}=req.body;
+exports.submitLog=async(req,res,next)=>{
+    try {
+        const {week,description}=req.body;
 
-    const studentData=await student.findOne({
-        rollno:req.session.rollno,
-        email:req.session.email
-    });
+        const studentData=await student.findOne({
+            rollno:req.session.rollno,
+            email:req.session.email
+        });
 
-    if(!studentData)
-    {
-        return res.redirect('/student/login')
+        if(!studentData)
+        {
+            return res.redirect('/student/login')
+        }
+
+        const newLog=new Log({
+            studentId:studentData._id,
+            week,
+            description,
+            file: req.file ? req.file.path : null // Save Cloudinary URL
+        });
+
+        await newLog.save();
+
+        const faculties = await faculty.find({ department: studentData.department });
+        const notifications = faculties.map(f => ({
+            userId: f._id,
+            userType: 'Faculty',
+            message: `Student ${studentData.firstname} ${studentData.lastname} uploaded a new report for Week ${week}.`
+        }));
+        if (notifications.length > 0) {
+            await Notification.insertMany(notifications);
+        }
+
+        req.session.message = "Report submitted successfully!";
+        return res.redirect('/student/dashboard')
+    } catch (err) {
+        next(err);
     }
-
-    const newLog=new Log({
-        studentId:studentData._id,
-        week,
-        description,
-        file: req.file ? req.file.path : null // Save Cloudinary URL
-    });
-
-    await newLog.save();
-
-    const faculties = await faculty.find({ department: studentData.department });
-    const notifications = faculties.map(f => ({
-        userId: f._id,
-        userType: 'Faculty',
-        message: `Student ${studentData.firstname} ${studentData.lastname} uploaded a new report for Week ${week}.`
-    }));
-    if (notifications.length > 0) {
-        await Notification.insertMany(notifications);
-    }
-
-    req.session.message = "Report submitted successfully!";
-    return res.redirect('/student/dashboard')
 }
 
 //================= student logout logic==========================>
