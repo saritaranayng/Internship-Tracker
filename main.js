@@ -7,7 +7,7 @@ const homeRoutes = require('./routes/homeRoutes');
 const path = require('path');
 const connectDB = require("./config/db");
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
+const MongoStore = require('connect-mongo').default;
 const os = require('os');
 
 connectDB();
@@ -31,7 +31,7 @@ app.use(session({
 }));
 
 app.set('view engine', 'ejs');
-
+app.set('views', path.join(__dirname, 'views'));
 app.use('/', homeRoutes);
 app.use('/student', studentRoutes);
 app.use('/faculty', facultyRoutes);
