@@ -166,7 +166,7 @@
                                                     <td style="font-size: 0.85rem; color: var(--text-muted);"><%= log.date ? new Date(log.date).toLocaleDateString() : 'N/A' %></td>
                                                     <td>
                                                         <% if (log.file) { %>
-                                                            <a href="/uploads/<%= log.file %>" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 0.85rem;">View</a>
+                                                            <a href="<%= log.file.startsWith('http') ? log.file : '/uploads/' + log.file %>" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 0.85rem;">View</a>
                                                         <% } else { %>
                                                             <span style="color: var(--text-muted); font-size: 0.85rem;">None</span>
                                                         <% } %>

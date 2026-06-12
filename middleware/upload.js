@@ -1,35 +1,22 @@
 const multer = require('multer');
-const path = require('path');
-const os = require('os');
-const fs = require('fs');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
 
-// Ensure temp upload directory exists (Vercel allows writing to /tmp)
-const tempDir = path.join(os.tmpdir(), 'uploads');
-if (!fs.existsSync(tempDir)){
-    fs.mkdirSync(tempDir, { recursive: true });
-}
-
-// Set storage engine
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, tempDir); // Store in temp directory
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname); // Unique filename
-  }
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// File filter for safety (optional)
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /pdf|doc|docx|jpg|png|jpeg/;
-  const extName = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  if (extName) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only documents and images allowed'));
-  }
-};
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'internship_logs', // Folder name in your Cloudinary account
+    allowed_formats: ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'docx'],
+    resource_type: 'auto' // Important so PDFs are supported
+  },
+});
 
-const upload = multer({ storage: storage, fileFilter: fileFilter });
+const upload = multer({ storage: storage });
 
 module.exports = upload;

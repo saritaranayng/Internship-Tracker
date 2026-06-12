@@ -152,7 +152,7 @@ exports.submitLog=async(req,res)=>{
         studentId:studentData._id,
         week,
         description,
-        file: req.file ? req.file.filename : null // Save file name
+        file: req.file ? req.file.path : null // Save Cloudinary URL
     });
 
     await newLog.save();
@@ -213,7 +213,7 @@ exports.submitLog=async(req,res)=>{
 
     // If a new file is uploaded, update it too
     if (req.file) {
-        updateData.file = req.file.filename;
+        updateData.file = req.file.path; // Save Cloudinary URL
     }
 
     try {

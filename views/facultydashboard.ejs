@@ -143,7 +143,7 @@
                                             <td style="max-width: 250px; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= student.log %></td>
                                             <td>
                                                 <% if (student.file) { %>
-                                                    <a href="/uploads/<%= student.file %>" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 0.85rem;">View Artifact</a>
+                                                    <a href="<%= student.file.startsWith('http') ? student.file : '/uploads/' + student.file %>" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 0.85rem;">View Artifact</a>
                                                 <% } else { %>
                                                     <span style="color: var(--text-muted); font-size: 0.85rem;">None</span>
                                                 <% } %>
