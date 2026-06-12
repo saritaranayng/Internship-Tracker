@@ -77,7 +77,7 @@ exports.loginform = async (req, res) => {
         }
         catch (err) {
             console.error(err);
-            res.render('Slogin', { message: "Internal server error" })
+            res.render('Slogin', { message: "Error: " + err.message })
         }
     } else {
         res.render('Slogin', { message: "All fields are required" })
