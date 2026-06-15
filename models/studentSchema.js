@@ -8,6 +8,14 @@ const studentSchema=mongoose.Schema(
         course:String,
         department: String, 
         rollno: { type: Number, required: true, unique: true },
+        phone: String,
+        profilePicture: String,
+        preferences: {
+            weeklyReminders: { type: Boolean, default: true },
+            feedbackNotifs: { type: Boolean, default: true },
+            gradeNotifs: { type: Boolean, default: true }
+        },
+        isActive: { type: Boolean, default: true },
         createdAt:{type:Date,default:Date.now}
     },
     {

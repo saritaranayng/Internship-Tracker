@@ -71,6 +71,13 @@ exports.loginform = async (req, res) => {
                 return res.status(401).render('Slogin', { message: "Invalid credentials" });
             }
 
+            let messageStr = "";
+            if (learner.isActive === false) {
+                learner.isActive = true;
+                await learner.save();
+                messageStr = "Welcome back! Your account has been reactivated.";
+            }
+
             req.session.rollno = learner.rollno;
             req.session.email = learner.email;
             
@@ -78,6 +85,9 @@ exports.loginform = async (req, res) => {
                 if (err) {
                     console.error("Session save error:", err);
                     return res.render('Slogin', { message: "Error saving session" });
+                }
+                if (messageStr) {
+                    req.session.message = messageStr;
                 }
                 return res.redirect('/student/dashboard');
             });
@@ -187,6 +197,22 @@ exports.submitLog=async(req,res,next)=>{
  }
 
 //<================================render edit log page=====================>
+ exports.getViewLogPage = async (req, res) => {
+    const logId = req.params.id;
+    try {
+        const studentData = await student.findOne({ email: req.session.email });
+        if (!studentData) return res.redirect('/student/login');
+        const log = await Log.findById(logId);
+        if (!log) {
+            return res.send('log not found ');
+        }
+        res.render('viewreport', { student: studentData, log });
+    } catch(err) {
+        console.error(err);
+        res.send('error loading view page');
+    }
+ };
+
  exports.getEditLogPage=async(req,res)=>{
     const logId=req.params.id;
     try{
@@ -212,6 +238,7 @@ exports.submitLog=async(req,res,next)=>{
     const updateData = {
         week,
         description,
+        status: 'Pending',
         updatedAt: new Date()
     };
 
@@ -264,8 +291,12 @@ exports.changePassword = async (req, res) => {
         studentData.password = hashedNewPassword;
         await studentData.save();
 
-        req.session.message = 'Password changed successfully!';
-        res.redirect('/student/dashboard');
+        req.session.destroy(err => {
+            if (err) {
+                console.error("Session destruction error:", err);
+            }
+            res.render('Slogin', { message: 'Password changed successfully! Please log in with your new password.' });
+        });
     } catch (err) {
         console.error('Error changing password:', err);
         req.session.message = 'Error changing password!';
@@ -277,3 +308,106 @@ exports.changePassword = async (req, res) => {
 
 
 
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const { firstname, lastname, email, phone } = req.body;
+        const studentData = await student.findOne({ rollno: req.session.rollno, email: req.session.email });
+
+        if (!studentData) {
+            return res.redirect('/student/login');
+        }
+
+        studentData.firstname = firstname;
+        studentData.lastname = lastname;
+        studentData.email = email;
+        studentData.phone = phone;
+
+        if (req.file) {
+            studentData.profilePicture = req.file.path;
+        }
+
+        await studentData.save();
+        req.session.email = email; // update session email in case it changed
+        req.session.message = 'Profile updated successfully!';
+        res.redirect('/student/dashboard');
+    } catch (err) {
+        console.error('Error updating profile:', err);
+        req.session.message = 'Error updating profile!';
+        res.redirect('/student/dashboard');
+    }
+};
+
+exports.updatePreferences = async (req, res) => {
+    try {
+        const { weeklyReminders, feedbackNotifs, gradeNotifs } = req.body;
+        const studentData = await student.findOne({ rollno: req.session.rollno, email: req.session.email });
+
+        if (!studentData) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        studentData.preferences = {
+            weeklyReminders: weeklyReminders === 'on',
+            feedbackNotifs: feedbackNotifs === 'on',
+            gradeNotifs: gradeNotifs === 'on'
+        };
+
+        await studentData.save();
+        res.json({ success: true, message: 'Preferences updated' });
+    } catch (err) {
+        console.error('Error updating preferences:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+exports.deleteAccount = async (req, res) => {
+    try {
+        const studentData = await student.findOne({ rollno: req.session.rollno, email: req.session.email });
+        if (!studentData) {
+            return res.redirect('/student/login');
+        }
+
+        // Delete all logs related to student
+        await Log.deleteMany({ studentId: studentData._id });
+        // Delete all notifications related to student
+        await Notification.deleteMany({ userId: studentData._id, userType: 'Student' });
+        // Delete the student account
+        await student.findByIdAndDelete(studentData._id);
+
+        req.session.destroy(err => {
+            if (err) {
+                console.error(err);
+            }
+            res.redirect('/student/login');
+        });
+    } catch (err) {
+        console.error('Error deleting account:', err);
+        req.session.message = 'Error deleting account!';
+        res.redirect('/student/dashboard');
+    }
+};
+
+exports.deactivateAccount = async (req, res) => {
+    try {
+        const studentData = await student.findOne({ rollno: req.session.rollno, email: req.session.email });
+        if (!studentData) {
+            return res.redirect('/student/login');
+        }
+
+        // Set account to inactive instead of deleting
+        studentData.isActive = false;
+        await studentData.save();
+
+        req.session.destroy(err => {
+            if (err) {
+                console.error(err);
+            }
+            res.render('Slogin', { message: 'Your account has been successfully deactivated. Log in anytime to reactivate it.' });
+        });
+    } catch (err) {
+        console.error('Error deactivating account:', err);
+        req.session.message = 'Error deactivating account!';
+        res.redirect('/student/dashboard');
+    }
+};

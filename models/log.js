@@ -23,9 +23,13 @@ const logSchema = new mongoose.Schema({
     default: 'Pending' // or Approved/Rejected
   },
   file: {
-  type: String, // path to uploaded file
-  required: false
-}
+    type: String, // path to uploaded file
+    required: false
+  },
+  feedback: {
+    type: String,
+    default: '' // stores faculty feedback on approve/reject
+  }
 
 });
 

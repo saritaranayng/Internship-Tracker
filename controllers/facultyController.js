@@ -135,7 +135,8 @@ exports.facultydashboard = async (req, res) => {
                 date: log.date ? log.date.toLocaleDateString() : "N/A",
                 log: log.description,
                 status: log.status,
-                file: log.file
+                file: log.file,
+                feedback: log.feedback
             }));
 
         // 🟢 Step 4: Fetch Notifications
@@ -159,12 +160,18 @@ exports.facultydashboard = async (req, res) => {
 
 exports.approveLog = async (req, res) => {
     try {
-        const log = await Log.findByIdAndUpdate(req.params.id, { status: 'Approved' });
+        const feedback = req.body.feedback || '';
+        const log = await Log.findByIdAndUpdate(req.params.id, { 
+            status: 'Approved',
+            feedback: feedback
+        });
         if (log && log.studentId) {
+            let msg = `Your report for Week ${log.week} has been Approved.`;
+            if (feedback.trim()) msg += ` Remarks: ${feedback}`;
             const notification = new Notification({
                 userId: log.studentId,
                 userType: 'Student',
-                message: `Your report for Week ${log.week} has been Approved.`
+                message: msg
             });
             await notification.save();
         }
@@ -178,12 +185,16 @@ exports.approveLog = async (req, res) => {
 
 exports.rejectLog = async (req, res) => {
     try {
-        const log = await Log.findByIdAndUpdate(req.params.id, { status: 'Rejected' });
+        const feedback = req.body.feedback || 'No reason provided.';
+        const log = await Log.findByIdAndUpdate(req.params.id, { 
+            status: 'Rejected',
+            feedback: feedback
+        });
         if (log && log.studentId) {
             const notification = new Notification({
                 userId: log.studentId,
                 userType: 'Student',
-                message: `Your report for Week ${log.week} has been Rejected.`
+                message: `Your report for Week ${log.week} has been Rejected. Reason: ${feedback}`
             });
             await notification.save();
         }
