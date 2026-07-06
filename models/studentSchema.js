@@ -16,6 +16,19 @@ const studentSchema=mongoose.Schema(
             gradeNotifs: { type: Boolean, default: true }
         },
         isActive: { type: Boolean, default: true },
+        internship: {
+            companyName: { type: String, default: '' },
+            contactDetails: { type: String, default: '' },
+            internshipField: { type: String, default: '' },
+            duration: { type: String, default: '' },
+            mode: { type: String, enum: ['Remote', 'Hybrid', 'On-site', ''], default: '' },
+            isPaid: { type: String, enum: ['Paid', 'Unpaid', ''], default: '' },
+            stipend: { type: Number, default: 0 },
+            mentorDetails: { type: String, default: '' },
+            gitLink: { type: String, default: '' },
+            driveLink: { type: String, default: '' },
+            offerLetter: { type: String, default: '' }
+        },
         createdAt:{type:Date,default:Date.now}
     },
     {

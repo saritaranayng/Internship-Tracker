@@ -13,9 +13,9 @@ router.post('/login', facultydetails.Floginform);
 router.get('/dashboard', isFacultyLoggedIn, facultydetails.facultydashboard);
 router.post('/logout', facultydetails.facultyLogout);
 
-// Approve/Reject Logs
-router.post('/approve/:id', isFacultyLoggedIn, facultydetails.approveLog);
-router.post('/reject/:id', isFacultyLoggedIn, facultydetails.rejectLog);
+// Approve/Request Changes for Weekly Summaries
+router.post('/approve/:id', isFacultyLoggedIn, facultydetails.approveSummary);
+router.post('/request-changes/:id', isFacultyLoggedIn, facultydetails.requestChangesSummary);
 router.post('/changepassword', isFacultyLoggedIn, facultydetails.changePassword);
 
 module.exports = router;

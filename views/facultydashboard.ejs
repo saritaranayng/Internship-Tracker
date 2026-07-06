@@ -122,8 +122,7 @@
                                 <option value="all" style="color: black;">All Submissions</option>
                                 <option value="pending" style="color: black;">Pending</option>
                                 <option value="approved" style="color: black;">Approved</option>
-                                <option value="rejected" style="color: black;">Rejected</option>
-                                <option value="re-evaluation" style="color: black;">Re-evaluation</option>
+                                <option value="changes-requested" style="color: black;">Changes Requested</option>
                             </select>
                             <span style="font-size: 0.8rem; background: rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 20px;" id="totalCountDisplay">
                                 <%= students.length %> Total
@@ -137,48 +136,45 @@
                                 <thead>
                                     <tr>
                                         <th>Student Name</th>
+                                        <th>Roll Number</th>
+                                        <th>Week</th>
+                                        <th>Work Completed</th>
                                         <th>Date Submitted</th>
-                                        <th>Log Content</th>
-                                        <th>File</th>
                                         <th>Status</th>
-                                        <th>Review</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% students.forEach(student => { %>
-                                        <tr class="log-row" data-status="<%= student.status.toLowerCase() %>">
-                                            <td style="font-weight: 600;"><%= student.name %></td>
-                                            <td style="font-size: 0.85rem; color: var(--text-muted);"><%= student.date %></td>
-                                            <td style="max-width: 250px; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= student.log %></td>
+                                    <% students.forEach(item => { %>
+                                        <tr class="log-row" data-status="<%= item.status.toLowerCase().replace(' ', '-') %>">
+                                            <td style="font-weight: 600;"><%= item.name %></td>
+                                            <td><%= item.student.rollno %></td>
+                                            <td style="font-weight: 600;">W-<%= item.week %></td>
+                                            <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= item.workCompleted %></td>
+                                            <td style="font-size: 0.85rem; color: var(--text-muted);"><%= item.date %></td>
                                             <td>
-                                                <% if (student.file) { %>
-                                                    <a href="<%= student.file.startsWith('http') ? student.file : '/uploads/' + student.file %>" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 0.85rem;">View Artifact</a>
-                                                <% } else { %>
-                                                    <span style="color: var(--text-muted); font-size: 0.85rem;">None</span>
-                                                <% } %>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge status-<%= student.status.toLowerCase() %>">
-                                                    <%= student.status %>
+                                                <span class="status-badge status-<%= item.status.toLowerCase().replace(' ', '-') %>">
+                                                    <%= item.status %>
                                                 </span>
                                             </td>
                                             <td>
-                                                <div style="display: flex; gap: 8px;">
-                                                    <% if (student.status === 'Pending' || student.status === 'Re-evaluation') { %>
-                                                        <button onclick="openFeedbackModal('approve', '<%= student._id %>')" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem;">Approve</button>
-                                                        <button onclick="openFeedbackModal('reject', '<%= student._id %>')" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem;">Reject</button>
-
-                                                    <% } else { %>
-                                                        <div>
-                                                            <span style="color: var(--text-muted); font-size: 0.75rem;">Evaluated</span>
-                                                            <% if (student.feedback && student.feedback.trim() !== '') { %>
-                                                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; max-width: 150px; line-height: 1.2;">
-                                                                    <%= student.feedback %>
-                                                                </div>
-                                                            <% } %>
-                                                        </div>
-                                                    <% } %>
-                                                </div>
+                                                <script type="application/json" id="tasks-<%= item._id %>"><%- JSON.stringify(item.tasks) %></script>
+                                                <button onclick="openReviewModal(this)"
+                                                        data-id="<%= item._id %>"
+                                                        data-name="<%= item.name %>"
+                                                        data-roll="<%= item.student.rollno %>"
+                                                        data-week="<%= item.week %>"
+                                                        data-completed="<%= item.workCompleted %>"
+                                                        data-challenges="<%= item.challengesFaced %>"
+                                                        data-solutions="<%= item.challengesSolved %>"
+                                                        data-skills="<%= item.skillsLearned %>"
+                                                        data-goals="<%= item.goalsNextWeek %>"
+                                                        data-status="<%= item.status %>"
+                                                        data-feedback="<%= item.feedback || '' %>"
+                                                        data-allowedits="<%= item.allowTaskEdits %>"
+                                                        style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--primary); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600;">
+                                                    Review
+                                                </button>
                                             </td>
                                         </tr>
                                     <% }) %>
@@ -288,52 +284,222 @@
       </script>
     <% } %>
 
-  <!-- Feedback Modal -->
-  <div id="feedbackModal" class="loader-overlay" style="z-index: 10000;">
-    <div style="background: var(--card-bg); padding: 24px; border-radius: 16px; border: 1px solid var(--glass-border); width: 90%; max-width: 400px; backdrop-filter: blur(20px);">
-        <h3 id="modalTitle" style="margin-bottom: 16px;">Provide Feedback</h3>
-        <form id="feedbackForm" method="POST">
-            <textarea name="feedback" id="feedbackText" rows="4" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 8px; color: white; resize: none; margin-bottom: 16px;" placeholder="Enter your remarks here..."></textarea>
-            <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                <button type="button" onclick="closeFeedbackModal()" style="padding: 8px 16px; background: transparent; color: var(--text-muted); border: none; cursor: pointer;">Cancel</button>
-                <button type="submit" id="modalSubmitBtn" style="padding: 8px 16px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">Submit</button>
+  <!-- Review Weekly Summary Modal -->
+  <div id="reviewModal" class="loader-overlay" style="z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: var(--card-bg); padding: 32px; border-radius: 16px; border: 1px solid var(--glass-border); width: 90%; max-width: 750px; backdrop-filter: blur(20px); max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--glass-border); padding-bottom: 16px;">
+            <h3 style="margin: 0;">Review Submission</h3>
+            <span id="reviewStatusBadge" class="status-badge"></span>
+        </div>
+        
+        <!-- Student Info -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--glass-border);">
+            <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Student Name</label>
+                <p id="reviewStudentName" style="margin: 4px 0 0; font-weight: 600;"></p>
+            </div>
+            <div>
+                <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Roll Number</label>
+                <p id="reviewStudentRoll" style="margin: 4px 0 0; font-weight: 600;"></p>
+            </div>
+        </div>
+
+        <!-- Weekly Summary Details -->
+        <h4 style="margin-top: 0; margin-bottom: 12px; color: var(--primary);">Weekly Summary (Week <span id="reviewWeekNum"></span>)</h4>
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--glass-border);">
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-main);">Work Completed:</label>
+                <p id="reviewWorkCompleted" style="margin: 4px 0 0; font-size: 0.9rem; line-height: 1.4; color: var(--text-muted);"></p>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-main);">Challenges Faced:</label>
+                    <p id="reviewChallenges" style="margin: 4px 0 0; font-size: 0.9rem; line-height: 1.4; color: var(--text-muted);"></p>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-main);">How Solved:</label>
+                    <p id="reviewSolutions" style="margin: 4px 0 0; font-size: 0.9rem; line-height: 1.4; color: var(--text-muted);"></p>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-main);">Skills Learned:</label>
+                    <p id="reviewSkills" style="margin: 4px 0 0; font-size: 0.9rem; color: var(--text-muted);"></p>
+                </div>
+                <div>
+                    <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-main);">Goals for Next Week:</label>
+                    <p id="reviewGoals" style="margin: 4px 0 0; font-size: 0.9rem; line-height: 1.4; color: var(--text-muted);"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collapsible Daily Task Logs Section -->
+        <div style="margin-bottom: 24px;">
+            <button onclick="toggleReviewTasks()" style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.15); padding: 12px 16px; border-radius: 8px; color: var(--primary); cursor: pointer; font-weight: 600; font-size: 0.9rem;">
+                <span>Show/Hide Daily Task Logs (<span id="reviewTaskCount">0</span>)</span>
+                <span id="reviewTaskArrow">▼</span>
+            </button>
+            <div id="reviewTasksContainer" style="display: none; margin-top: 12px; max-height: 250px; overflow-y: auto; border: 1px solid var(--glass-border); border-radius: 8px; background: rgba(0,0,0,0.1);">
+                <table class="data-table" style="margin: 0; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Date & Title</th>
+                            <th>Description</th>
+                            <th>Hours</th>
+                            <th>Status</th>
+                            <th>Links</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviewTasksTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Faculty Feedback & Action Form -->
+        <form id="reviewActionForm" method="POST" style="margin: 0;">
+            <div class="form-group">
+                <label>Remarks / Feedback *</label>
+                <textarea name="feedback" id="reviewFeedbackText" rows="3" class="form-control" style="resize: none;" placeholder="Provide remarks or details of requested changes..."></textarea>
+            </div>
+            
+            <div id="allowEditsContainer" class="form-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 24px;">
+                <input type="checkbox" name="allowTaskEdits" id="reviewAllowEdits" style="width: auto; margin: 0;">
+                <label for="reviewAllowEdits" style="margin: 0; font-size: 0.85rem; font-weight: normal; cursor: pointer;">Allow student to edit daily tasks for this week</label>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; align-items: center;">
+                <button type="button" onclick="closeReviewModal()" style="padding: 10px 20px; background: transparent; color: var(--text-muted); border: none; cursor: pointer; font-size: 0.9rem;">Cancel</button>
+                <div style="display: flex; gap: 12px;">
+                    <button type="button" onclick="submitReviewAction('request-changes')" style="padding: 10px 20px; background: #eab308; color: #000; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">Request Changes</button>
+                    <button type="button" onclick="submitReviewAction('approve')" style="padding: 10px 20px; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">Approve</button>
+                </div>
             </div>
         </form>
     </div>
   </div>
 
   <script>
-    function openFeedbackModal(action, logId) {
-        const modal = document.getElementById('feedbackModal');
-        const form = document.getElementById('feedbackForm');
-        const title = document.getElementById('modalTitle');
-        const submitBtn = document.getElementById('modalSubmitBtn');
-        const textarea = document.getElementById('feedbackText');
-        
-        if (action === 'approve') {
-            title.innerText = 'Approve Log & Add Feedback';
-            form.action = '/faculty/approve/' + logId;
-            submitBtn.style.background = '#10b981';
-            submitBtn.innerText = 'Approve';
-            textarea.placeholder = 'Optional feedback or positive remarks...';
-            textarea.required = false;
-        } else {
-            title.innerText = 'Reject Log & Add Reason';
-            form.action = '/faculty/reject/' + logId;
-            submitBtn.style.background = '#ef4444';
-            submitBtn.innerText = 'Reject';
-            textarea.placeholder = 'Required: Explain why this is being rejected...';
-            textarea.required = true;
+    let currentSummaryId = null;
+
+    function openReviewModal(btn) {
+        currentSummaryId = btn.getAttribute('data-id');
+        const name = btn.getAttribute('data-name');
+        const roll = btn.getAttribute('data-roll');
+        const week = btn.getAttribute('data-week');
+        const completed = btn.getAttribute('data-completed');
+        const challenges = btn.getAttribute('data-challenges');
+        const solutions = btn.getAttribute('data-solutions');
+        const skills = btn.getAttribute('data-skills');
+        const goals = btn.getAttribute('data-goals');
+        const status = btn.getAttribute('data-status');
+        const feedback = btn.getAttribute('data-feedback');
+        const allowEdits = btn.getAttribute('data-allowedits') === 'true';
+
+        document.getElementById('reviewStudentName').innerText = name;
+        document.getElementById('reviewStudentRoll').innerText = roll;
+        document.getElementById('reviewWeekNum').innerText = week;
+        document.getElementById('reviewWorkCompleted').innerText = completed;
+        document.getElementById('reviewChallenges').innerText = challenges;
+        document.getElementById('reviewSolutions').innerText = solutions;
+        document.getElementById('reviewSkills').innerText = skills;
+        document.getElementById('reviewGoals').innerText = goals;
+        document.getElementById('reviewFeedbackText').value = feedback;
+        document.getElementById('reviewAllowEdits').checked = allowEdits;
+
+        const badge = document.getElementById('reviewStatusBadge');
+        badge.innerText = status;
+        badge.className = 'status-badge status-' + status.toLowerCase().replace(' ', '-');
+
+        // Populate tasks
+        const tasksScript = document.getElementById('tasks-' + currentSummaryId);
+        let tasks = [];
+        if (tasksScript) {
+            try {
+                tasks = JSON.parse(tasksScript.textContent);
+            } catch(e) {
+                console.error(e);
+            }
         }
         
-        modal.classList.add('active');
+        document.getElementById('reviewTaskCount').innerText = tasks.length;
+        
+        const tbody = document.getElementById('reviewTasksTableBody');
+        tbody.innerHTML = '';
+        if (tasks.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No task logs submitted for this week.</td></tr>';
+        } else {
+            tasks.forEach(t => {
+                const dateStr = new Date(t.date).toLocaleDateString();
+                let linksHtml = '';
+                if (t.evidenceFile) {
+                    linksHtml += `<a href="${t.evidenceFile}" target="_blank" style="color:var(--accent);text-decoration:none;font-size:0.75rem;margin-right:8px;">Evidence</a>`;
+                }
+                if (t.gitLink) {
+                    linksHtml += `<a href="${t.gitLink}" target="_blank" style="color:var(--primary);text-decoration:none;font-size:0.75rem;margin-right:8px;">GitHub</a>`;
+                }
+                if (t.demoLink) {
+                    linksHtml += `<a href="${t.demoLink}" target="_blank" style="color:#10b981;text-decoration:none;font-size:0.75rem;">Demo</a>`;
+                }
+                if (!linksHtml) linksHtml = '<span style="color:var(--text-muted);font-size:0.75rem;">None</span>';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;font-size:0.85rem;">${t.title}</div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);">${dateStr}</div>
+                        </td>
+                        <td style="font-size:0.8rem;line-height:1.3;max-width:200px;">${t.description}</td>
+                        <td style="font-size:0.8rem;">${t.hoursWorked} hrs</td>
+                        <td>
+                            <span class="status-badge status-${t.status.toLowerCase().replace(' ', '-')}">${t.status}</span>
+                        </td>
+                        <td>${linksHtml}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Reset tasks visibility to closed
+        document.getElementById('reviewTasksContainer').style.display = 'none';
+        document.getElementById('reviewTaskArrow').innerText = '▼';
+
+        document.getElementById('reviewModal').classList.add('active');
     }
-    
-    function closeFeedbackModal() {
-        document.getElementById('feedbackModal').classList.remove('active');
-        document.getElementById('feedbackForm').reset();
+
+    function toggleReviewTasks() {
+        const container = document.getElementById('reviewTasksContainer');
+        const arrow = document.getElementById('reviewTaskArrow');
+        if (container.style.display === 'none') {
+            container.style.display = 'block';
+            arrow.innerText = '▲';
+        } else {
+            container.style.display = 'none';
+            arrow.innerText = '▼';
+        }
     }
-    
+
+    function closeReviewModal() {
+        document.getElementById('reviewModal').classList.remove('active');
+    }
+
+    function submitReviewAction(action) {
+        const form = document.getElementById('reviewActionForm');
+        const feedback = document.getElementById('reviewFeedbackText').value.trim();
+
+        if (action === 'request-changes') {
+            if (!feedback) {
+                alert('Please enter remarks/feedback explaining the requested changes.');
+                return;
+            }
+            form.action = '/faculty/request-changes/' + currentSummaryId;
+        } else {
+            form.action = '/faculty/approve/' + currentSummaryId;
+        }
+
+        form.submit();
+    }
+
     function filterTable() {
         const filter = document.getElementById('statusFilter').value;
         const rows = document.querySelectorAll('.log-row');

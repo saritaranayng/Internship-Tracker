@@ -1,0 +1,50 @@
+
+> apnaproject@1.0.0 start
+> node main.js
+
+◇ injected env (6) from .env // tip: ⌘ suppress logs { quiet: true }
+Server is running at http://localhost:3000
+Connected to database: test
+Global Error: ReferenceError: /home/aviox/myproject/Internship-Tracker/views/studentdashboard.ejs:87
+    85|                     <div class="analytic-card">
+    86|                         <h4>Total Tasks Submitted</h4>
+ >> 87|                         <p><%= progress.totalTasks %></p>
+    88|                     </div>
+    89|                     <div class="analytic-card">
+    90|                         <h4>Total Hours Worked</h4>
+
+progress is not defined
+    at eval ("/home/aviox/myproject/Internship-Tracker/views/studentdashboard.ejs":27:26)
+    at studentdashboard (/home/aviox/myproject/Internship-Tracker/node_modules/ejs/lib/ejs.js:703:17)
+    at tryHandleCache (/home/aviox/myproject/Internship-Tracker/node_modules/ejs/lib/ejs.js:274:36)
+    at exports.renderFile [as engine] (/home/aviox/myproject/Internship-Tracker/node_modules/ejs/lib/ejs.js:491:10)
+    at View.render (/home/aviox/myproject/Internship-Tracker/node_modules/express/lib/view.js:139:8)
+    at tryRender (/home/aviox/myproject/Internship-Tracker/node_modules/express/lib/application.js:627:10)
+    at Function.render (/home/aviox/myproject/Internship-Tracker/node_modules/express/lib/application.js:574:3)
+    at ServerResponse.render (/home/aviox/myproject/Internship-Tracker/node_modules/express/lib/response.js:909:7)
+    at exports.studentdashboard (/home/aviox/myproject/Internship-Tracker/controllers/studentController.js:135:20)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  path: '/home/aviox/myproject/Internship-Tracker/views/studentdashboard.ejs'
+}
+Global Error: ReferenceError: /home/aviox/myproject/Internship-Tracker/views/studentdashboard.ejs:87
+    85|                     <div class="analytic-card">
+    86|                         <h4>Total Tasks Submitted</h4>
+ >> 87|                         <p><%= progress.totalTasks %></p>
+    88|                     </div>
+    89|                     <div class="analytic-card">
+    90|                         <h4>Total Hours Worked</h4>
+
+progress is not defined
+    at eval ("/home/aviox/myproject/Internship-Tracker/views/studentdashboard.ejs":27:26)
+    at studentdashboard (/home/aviox/myproject/Internship-Tracker/node_modules/ejs/lib/ejs.js:703:17)
+    at tryHandleCache (/home/aviox/myproject/Internship-Tracker/node_modules/ejs/lib/ejs.js:274:36)
+    at exports.renderFile [as engine] (/home/aviox/myproject/Internship-Tracker/node_modules/ejs/lib/ejs.js:491:10)
+    at View.render (/home/aviox/myproject/Internship-Tracker/node_modules/express/lib/view.js:139:8)
+    at tryRender (/home/aviox/myproject/Internship-Tracker/node_modules/express/lib/application.js:627:10)
+    at Function.render (/home/aviox/myproject/Internship-Tracker/node_modules/express/lib/application.js:574:3)
+    at ServerResponse.render (/home/aviox/myproject/Internship-Tracker/node_modules/express/lib/response.js:909:7)
+    at exports.studentdashboard (/home/aviox/myproject/Internship-Tracker/controllers/studentController.js:135:20)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  path: '/home/aviox/myproject/Internship-Tracker/views/studentdashboard.ejs'
+}
+Terminated

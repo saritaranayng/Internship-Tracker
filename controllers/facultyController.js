@@ -2,6 +2,8 @@ const{faculty}=require("../models/facultySchema");
 const bcrypt = require('bcrypt');
 const { student } = require('../models/studentSchema');
 const { Log } = require('../models/log');
+const { DailyTask } = require('../models/dailyTask');
+const { WeeklySummary } = require('../models/weeklySummary');
 const { Notification } = require("../models/notification");
 
 //<================================RENDERING OF PAGES==============================>
@@ -116,30 +118,48 @@ exports.facultydashboard = async (req, res) => {
             return res.redirect('/faculty/login');
         }
 
-        // 🟢 Step 1: Get all students in the faculty’s department
+        // 1. Get all students in the faculty’s department
         const studentsInDept = await student.find({ 
             department: staff.department ? staff.department.trim() : "" 
         });
 
         const studentIds = studentsInDept.map(s => s._id);
 
-        // 🟢 Step 2: Get logs only for those students and populate student info
-        const logs = await Log.find({ studentId: { $in: studentIds } }).populate('studentId');
+        // 2. Get Weekly Summaries only for those students and populate student info
+        const weeklySummaries = await WeeklySummary.find({ studentId: { $in: studentIds } })
+            .populate('studentId')
+            .sort({ date: -1 });
 
-        // 🟢 Step 3: Format logs Safely
-        const studentLogs = logs
-            .filter(log => log.studentId) // Ensure studentId is populated
-            .map(log => ({
-                _id: log._id,
-                name: (log.studentId.firstname || "") + " " + (log.studentId.lastname || ""),
-                date: log.date ? log.date.toLocaleDateString() : "N/A",
-                log: log.description,
-                status: log.status,
-                file: log.file,
-                feedback: log.feedback
-            }));
+        // 3. Get all daily tasks for these students to group them
+        const dailyTasks = await DailyTask.find({ studentId: { $in: studentIds } }).sort({ date: 1 });
 
-        // 🟢 Step 4: Fetch Notifications
+        // 4. Format summaries safely, bundling their respective daily tasks
+        const studentSummaries = weeklySummaries
+            .filter(summary => summary.studentId) // Ensure studentId is populated
+            .map(summary => {
+                const summaryTasks = dailyTasks.filter(task => 
+                    task.studentId.toString() === summary.studentId._id.toString() && 
+                    task.week === summary.week
+                );
+                return {
+                    _id: summary._id,
+                    student: summary.studentId,
+                    name: `${summary.studentId.firstname || ""} ${summary.studentId.lastname || ""}`,
+                    week: summary.week,
+                    workCompleted: summary.workCompleted,
+                    challengesFaced: summary.challengesFaced,
+                    challengesSolved: summary.challengesSolved,
+                    skillsLearned: summary.skillsLearned,
+                    goalsNextWeek: summary.goalsNextWeek,
+                    status: summary.status,
+                    feedback: summary.feedback,
+                    allowTaskEdits: summary.allowTaskEdits,
+                    date: summary.date ? summary.date.toLocaleDateString() : "N/A",
+                    tasks: summaryTasks
+                };
+            });
+
+        // 5. Fetch Notifications
         const notifications = await Notification.find({ userId: staff._id, userType: 'Faculty' }).sort({ createdAt: -1 });
 
         const message = req.session.message;
@@ -147,7 +167,7 @@ exports.facultydashboard = async (req, res) => {
 
         res.render('facultydashboard', {
             staff,
-            students: studentLogs,
+            students: studentSummaries, // Keeping the variable name 'students' to minimize changes in facultydashboard EJS
             notifications,
             message
         });
@@ -157,51 +177,65 @@ exports.facultydashboard = async (req, res) => {
     }
 };
 
-
-exports.approveLog = async (req, res) => {
+exports.approveSummary = async (req, res) => {
     try {
         const feedback = req.body.feedback || '';
-        const log = await Log.findByIdAndUpdate(req.params.id, { 
+        const summaryId = req.params.id;
+
+        const summary = await WeeklySummary.findByIdAndUpdate(summaryId, {
             status: 'Approved',
             feedback: feedback
-        });
-        if (log && log.studentId) {
-            let msg = `Your report for Week ${log.week} has been Approved.`;
+        }, { new: true });
+
+        if (summary && summary.studentId) {
+            let msg = `Your weekly summary for Week ${summary.week} has been Approved.`;
             if (feedback.trim()) msg += ` Remarks: ${feedback}`;
+            
             const notification = new Notification({
-                userId: log.studentId,
+                userId: summary.studentId,
                 userType: 'Student',
                 message: msg
             });
             await notification.save();
         }
-        req.session.message = 'Report approved successfully!';
+
+        req.session.message = 'Weekly summary approved successfully!';
     } catch (err) {
-        console.error("Error approving log:", err);
-        req.session.message = 'Error approving report.';
+        console.error("Error approving summary:", err);
+        req.session.message = 'Error approving weekly summary.';
     }
     res.redirect('/faculty/dashboard');
 };
 
-exports.rejectLog = async (req, res) => {
+exports.requestChangesSummary = async (req, res) => {
     try {
-        const feedback = req.body.feedback || 'No reason provided.';
-        const log = await Log.findByIdAndUpdate(req.params.id, { 
-            status: 'Rejected',
-            feedback: feedback
-        });
-        if (log && log.studentId) {
+        const feedback = req.body.feedback || 'Changes requested.';
+        const allowTaskEdits = req.body.allowTaskEdits === 'true' || req.body.allowTaskEdits === 'on';
+        const summaryId = req.params.id;
+
+        const summary = await WeeklySummary.findByIdAndUpdate(summaryId, {
+            status: 'Changes Requested',
+            feedback: feedback,
+            allowTaskEdits: allowTaskEdits
+        }, { new: true });
+
+        if (summary && summary.studentId) {
+            let msg = `Changes requested on your Weekly Summary for Week ${summary.week}.`;
+            if (feedback.trim()) msg += ` Remarks: ${feedback}`;
+            if (allowTaskEdits) msg += ` (You are allowed to edit your daily task logs for this week).`;
+
             const notification = new Notification({
-                userId: log.studentId,
+                userId: summary.studentId,
                 userType: 'Student',
-                message: `Your report for Week ${log.week} has been Rejected. Reason: ${feedback}`
+                message: msg
             });
             await notification.save();
         }
-        req.session.message = 'Report rejected successfully!';
+
+        req.session.message = 'Changes requested successfully!';
     } catch (err) {
-        console.error("Error rejecting log:", err);
-        req.session.message = 'Error rejecting report.';
+        console.error("Error requesting changes on summary:", err);
+        req.session.message = 'Error requesting changes.';
     }
     res.redirect('/faculty/dashboard');
 };

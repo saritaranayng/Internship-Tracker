@@ -45,8 +45,10 @@
         <aside class="sidebar">
             <div class="sidebar-logo">Skill <span>Record</span></div>
             <div class="nav-link active" onclick="switchTab('dashboard')">Dashboard</div>
-            <div class="nav-link" onclick="switchTab('report')">Report</div>
+            <div class="nav-link" onclick="switchTab('report')">Daily Tasks</div>
+            <div class="nav-link" onclick="switchTab('summaries')">Weekly Summaries</div>
             <div class="nav-link" onclick="switchTab('notifications')">Notifications</div>
+            <div class="nav-link" onclick="switchTab('internship')">Internship</div>
             <div class="nav-link" onclick="switchTab('settings')">Settings</div>
             
             <div style="margin-top: auto;">
@@ -79,28 +81,41 @@
 
             <!-- Dashboard Tab -->
             <div id="tab-dashboard" class="tab-content active">
-                <div class="analytics-grid">
-                    <% 
-                       let total = logs.length;
-                       let approved = logs.filter(l => l.status === 'Approved').length;
-                       let rejected = logs.filter(l => l.status === 'Rejected').length;
-                       let pending = logs.filter(l => l.status === 'Pending').length;
-                    %>
+                <div class="analytics-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
                     <div class="analytic-card">
-                        <h4>Total Reports</h4>
-                        <p><%= total %></p>
+                        <h4>Total Tasks Submitted</h4>
+                        <p><%= progress.totalTasks %></p>
                     </div>
                     <div class="analytic-card">
-                        <h4>Approved</h4>
-                        <p style="color: #10b981;"><%= approved %></p>
+                        <h4>Total Hours Worked</h4>
+                        <p><%= progress.totalHours %> hrs</p>
                     </div>
                     <div class="analytic-card">
-                        <h4>Pending</h4>
-                        <p style="color: #eab308;"><%= pending %></p>
+                        <h4>Summaries Submitted</h4>
+                        <p><%= progress.totalSummaries %> / <%= progress.durationWeeks %></p>
                     </div>
                     <div class="analytic-card">
-                        <h4>Rejected</h4>
-                        <p style="color: #ef4444;"><%= rejected %></p>
+                        <h4>Approved Summaries</h4>
+                        <p style="color: #10b981;"><%= progress.approvedSummaries %></p>
+                    </div>
+                </div>
+
+                <div class="profile-card" style="margin-bottom: 30px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <h3 style="margin-bottom: 8px;">Internship Progress</h3>
+                            <div style="background: var(--glass-border); border-radius: 9999px; height: 16px; overflow: hidden; position: relative; margin-top: 12px; margin-bottom: 12px; border: 1px solid var(--glass-border);">
+                                <div style="background: linear-gradient(90deg, var(--primary), var(--accent)); width: <%= progress.progressPercentage %>%; height: 100%; transition: width 0.5s ease-out; border-radius: 9999px;"></div>
+                            </div>
+                            <span style="font-size: 0.95rem; font-weight: 600; color: var(--text-main);"><%= progress.progressPercentage %>% Completed</span>
+                            <span style="font-size: 0.85rem; color: var(--text-muted); margin-left: 8px;">(<%= progress.approvedSummaries %> of <%= progress.durationWeeks %> weeks approved)</span>
+                        </div>
+                        <div>
+                            <a href="/student/final-report" target="_blank" style="background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; padding: 12px 24px; border: none; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); transition: all 0.2s;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                Generate Final Report
+                            </a>
+                        </div>
                     </div>
                 </div>
                 
@@ -108,13 +123,23 @@
                     <h3 style="margin-bottom: 16px;">Recent Activity</h3>
                     <% 
                       let activities = [];
-                      if (typeof logs !== 'undefined') {
-                          logs.forEach(log => {
+                      if (typeof dailyTasks !== 'undefined') {
+                          dailyTasks.forEach(task => {
                               activities.push({
-                                  type: 'log',
-                                  message: `Submitted log for Week ${log.week}`,
-                                  date: new Date(log.createdAt),
-                                  icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>'
+                                  type: 'task',
+                                  message: `Logged daily task: "${task.title}" (Week ${task.week})`,
+                                  date: new Date(task.createdAt),
+                                  icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>'
+                              });
+                          });
+                      }
+                      if (typeof weeklySummaries !== 'undefined') {
+                          weeklySummaries.forEach(sum => {
+                              activities.push({
+                                  type: 'summary',
+                                  message: `Submitted weekly summary for Week ${sum.week}`,
+                                  date: new Date(sum.createdAt),
+                                  icon: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>'
                               });
                           });
                       }
@@ -156,18 +181,49 @@
                 </div>
             </div>
 
-            <!-- Report Tab -->
+            <!-- Daily Tasks Tab -->
             <div id="tab-report" class="tab-content">
                 <div style="display: block;">
+                    <!-- Quick Links Banner -->
+                    <% if (student.internship && (student.internship.gitLink || student.internship.driveLink)) { %>
+                        <div class="profile-card" style="margin-bottom: 16px; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.15);">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                                <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">Internship Project Links:</span>
+                            </div>
+                            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                                <% if (student.internship.gitLink) { %>
+                                    <div style="display: flex; align-items: center; gap: 8px; background: var(--glass); border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 8px;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7a3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                                        <span style="font-size: 0.85rem; font-weight: 500; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= student.internship.gitLink %></span>
+                                        <button type="button" id="copyGitBtn" onclick="copyToClipboard('<%= student.internship.gitLink %>', 'copyGitBtn')" style="background: rgba(99, 102, 241, 0.1); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.2); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                            Copy
+                                        </button>
+                                    </div>
+                                <% } %>
+                                <% if (student.internship.driveLink) { %>
+                                    <div style="display: flex; align-items: center; gap: 8px; background: var(--glass); border: 1px solid var(--glass-border); padding: 6px 12px; border-radius: 8px;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                        <span style="font-size: 0.85rem; font-weight: 500; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= student.internship.driveLink %></span>
+                                        <button type="button" id="copyDriveBtn" onclick="copyToClipboard('<%= student.internship.driveLink %>', 'copyDriveBtn')" style="background: rgba(99, 102, 241, 0.1); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.2); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                            Copy
+                                        </button>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } %>
                     <div class="profile-card" style="min-height: 500px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                            <h3 style="margin: 0;">Your Technical Logs</h3>
-                            <button onclick="openCreateModal()" style="background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">+ Report</button>
+                            <h3 style="margin: 0;">Daily Task Logs</h3>
+                            <button onclick="openTaskModal(null)" style="background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">+ Add Task Log</button>
                         </div>
                         
-                        <% if (logs.length === 0) { %>
+                        <% if (dailyTasks.length === 0) { %>
                                 <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
-                                    <p>No activity logs found. Start by submitting your first entry.</p>
+                                    <p>No daily task logs found. Start by submitting your first entry.</p>
                                 </div>
                             <% } else { %>
                                 <div style="overflow-x: auto;">
@@ -175,53 +231,90 @@
                                         <thead>
                                             <tr>
                                                 <th>Week</th>
-                                                <th>Description</th>
                                                 <th>Date</th>
-                                                <th>File</th>
+                                                <th>Task Title</th>
+                                                <th>Hours</th>
                                                 <th>Status</th>
+                                                <th>Evidence</th>
+                                                <th>Links</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <% logs.forEach(log => { %>
+                                            <% dailyTasks.forEach(task => { %>
+                                                <%
+                                                  let taskIsEditable = true;
+                                                  const taskSummary = weeklySummaries.find(s => s.week === task.week);
+                                                  if (taskSummary) {
+                                                      if (taskSummary.status === 'Changes Requested' && taskSummary.allowTaskEdits) {
+                                                          taskIsEditable = true;
+                                                      } else {
+                                                          taskIsEditable = false;
+                                                      }
+                                                  }
+                                                %>
                                                 <tr>
-                                                    <td style="font-weight: 600;">W-<%= log.week %></td>
-                                                    <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= log.description %></td>
-                                                    <td style="font-size: 0.85rem; color: var(--text-muted);"><%= log.date ? new Date(log.date).toLocaleDateString() : 'N/A' %></td>
+                                                    <td style="font-weight: 600;">W-<%= task.week %></td>
+                                                    <td style="font-size: 0.85rem; color: var(--text-muted);"><%= task.date ? new Date(task.date).toLocaleDateString() : 'N/A' %></td>
+                                                    <td style="font-weight: 500;"><%= task.title %></td>
+                                                    <td><%= task.hoursWorked %> hrs</td>
                                                     <td>
-                                                        <% if (log.file) { %>
-                                                            <a href="<%= log.file.startsWith('http') ? log.file : '/uploads/' + log.file %>" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 0.85rem;">View</a>
+                                                        <span class="status-badge status-<%= task.status.toLowerCase().replace(' ', '-') %>">
+                                                            <%= task.status %>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <% if (task.file) { %>
+                                                            <a href="<%= task.file.startsWith('http') ? task.file : '/uploads/' + task.file %>" target="_blank" style="color: var(--accent); text-decoration: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px;">
+                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                                                                View
+                                                            </a>
                                                         <% } else { %>
                                                             <span style="color: var(--text-muted); font-size: 0.85rem;">None</span>
                                                         <% } %>
                                                     </td>
                                                     <td>
-                                                        <span class="status-badge status-<%= log.status.toLowerCase() %>">
-                                                            <%= log.status %>
-                                                        </span>
-                                                        <% if (log.feedback && log.feedback.trim() !== '') { %>
-                                                            <div style="margin-top: 8px; font-size: 0.75rem; color: var(--text-muted); background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px; max-width: 150px; line-height: 1.2;">
-                                                                <strong style="color: var(--primary);">Remarks:</strong> <%= log.feedback %>
-                                                            </div>
-                                                        <% } %>
+                                                        <div style="display: flex; gap: 8px;">
+                                                            <% if (task.gitLink) { %>
+                                                                <a href="<%= task.gitLink %>" target="_blank" title="GitHub / PR Link" style="color: var(--text-main);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a>
+                                                            <% } %>
+                                                            <% if (task.prLink) { %>
+                                                                <a href="<%= task.prLink %>" target="_blank" title="Pull Request" style="color: #38bdf8;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 15V9a4 4 0 0 0-4-4H9"></path><line x1="6" y1="9" x2="6" y2="15"></line></svg></a>
+                                                            <% } %>
+                                                            <% if (task.demoLink) { %>
+                                                                <a href="<%= task.demoLink %>" target="_blank" title="Live Demo" style="color: #10b981;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></a>
+                                                            <% } %>
+                                                        </div>
                                                     </td>
-                                                    <td style="display: flex; gap: 8px; align-items: center;">
-                                                        <button class="view-log-btn" 
-                                                                data-id="<%= log._id %>" 
-                                                                data-week="<%= log.week %>" 
-                                                                data-status="<%= log.status %>"
-                                                                data-file="<%= log.file ? (log.file.startsWith('http') ? log.file : '/uploads/' + log.file) : '' %>"
-                                                                onclick="openViewEditModal(this)"
-                                                                style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--primary); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;" title="View">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                                        </button>
-                                                        <% if (log.status !== 'Approved') { %>
-                                                            <button onclick="openDeleteModal('<%= log._id %>')" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Delete">
-                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                                            </button>
+                                                    <td>
+                                                        <% if (taskIsEditable) { %>
+                                                            <div style="display: flex; gap: 8px;">
+                                                                <button class="view-log-btn" 
+                                                                        data-id="<%= task._id %>" 
+                                                                        data-week="<%= task.week %>" 
+                                                                        data-title="<%= task.title %>"
+                                                                        data-date="<%= task.date ? task.date.toISOString().split('T')[0] : '' %>"
+                                                                        data-hours="<%= task.hoursWorked %>"
+                                                                        data-status="<%= task.status %>"
+                                                                        data-desc="<%= task.description %>"
+                                                                        data-git="<%= task.gitLink || '' %>"
+                                                                        data-pr="<%= task.prLink || '' %>"
+                                                                        data-demo="<%= task.demoLink || '' %>"
+                                                                        data-file="<%= task.file ? (task.file.startsWith('http') ? task.file : '/uploads/' + task.file) : '' %>"
+                                                                        onclick="openTaskModal(this)"
+                                                                        style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--primary); width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;" title="Edit">
+                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                                </button>
+                                                                <button onclick="openDeleteTaskModal('<%= task._id %>')" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Delete">
+                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                                </button>
+                                                            </div>
+                                                        <% } else { %>
+                                                            <span style="color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px;" title="Locked (Weekly Summary Submitted)">
+                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                                                Locked
+                                                            </span>
                                                         <% } %>
-                                                        <div class="hidden-desc" style="display: none;"><%= log.description %></div>
-                                                        <div class="hidden-feedback" style="display: none;"><%= log.feedback || '' %></div>
                                                     </td>
                                                 </tr>
                                             <% }) %>
@@ -234,6 +327,99 @@
             </div>
 
             <!-- Settings Tab -->
+            <!-- Weekly Summaries Tab -->
+            <div id="tab-summaries" class="tab-content">
+                <div style="display: block;">
+                    <div class="profile-card" style="min-height: 500px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                            <h3 style="margin: 0;">Weekly Summaries</h3>
+                            <button onclick="openSummaryModal()" style="background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">+ Add Weekly Summary</button>
+                        </div>
+                        
+                        <% if (weeklySummaries.length === 0) { %>
+                            <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                                <p>No weekly summaries found. Submit a weekly summary at the end of each week.</p>
+                            </div>
+                        <% } else { %>
+                            <div style="overflow-x: auto;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Week</th>
+                                            <th>Work Completed</th>
+                                            <th>Challenges & Solutions</th>
+                                            <th>Skills Learned</th>
+                                            <th>Status</th>
+                                            <th>Faculty Remarks</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% weeklySummaries.forEach(sum => { %>
+                                            <tr>
+                                                <td style="font-weight: 600;">Week <%= sum.week %></td>
+                                                <td style="max-width: 250px; font-size: 0.9rem; line-height: 1.4;"><%= sum.workCompleted %></td>
+                                                <td style="max-width: 250px; font-size: 0.85rem; line-height: 1.4; color: var(--text-muted);">
+                                                    <strong>Challenges:</strong> <%= sum.challengesFaced %><br>
+                                                    <strong>Solutions:</strong> <%= sum.challengesSolved %>
+                                                </td>
+                                                <td>
+                                                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                                        <% if(sum.skillsLearned) { %>
+                                                            <% sum.skillsLearned.split(',').forEach(skill => { %>
+                                                                <% if(skill.trim()) { %>
+                                                                    <span style="font-size: 0.75rem; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); padding: 2px 6px; border-radius: 4px; color: var(--primary);"><%= skill.trim() %></span>
+                                                                <% } %>
+                                                            <% }) %>
+                                                        <% } %>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="status-badge status-<%= sum.status.toLowerCase().replace(' ', '-') %>">
+                                                        <%= sum.status %>
+                                                    </span>
+                                                </td>
+                                                <td style="font-size: 0.85rem; max-width: 200px;">
+                                                    <% if (sum.feedback && sum.feedback.trim() !== '') { %>
+                                                        <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; border: 1px solid var(--glass-border);">
+                                                            <%= sum.feedback %>
+                                                        </div>
+                                                    <% } else { %>
+                                                        <span style="color: var(--text-muted); font-style: italic;">No remarks yet</span>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (sum.status !== 'Approved') { %>
+                                                        <button class="view-log-btn" 
+                                                                data-id="<%= sum._id %>" 
+                                                                data-week="<%= sum.week %>" 
+                                                                data-completed="<%= sum.workCompleted %>"
+                                                                data-challenges="<%= sum.challengesFaced %>"
+                                                                data-solutions="<%= sum.challengesSolved %>"
+                                                                data-skills="<%= sum.skillsLearned %>"
+                                                                data-goals="<%= sum.goalsNextWeek %>"
+                                                                onclick="openEditSummaryModal(this)"
+                                                                style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--primary); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;" title="Edit Summary">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                            Edit
+                                                        </button>
+                                                    <% } else { %>
+                                                        <span style="color: #10b981; display: inline-flex; align-items: center; gap: 4px; font-size: 0.85rem;">
+                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                                            Approved
+                                                        </span>
+                                                    <% } %>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
             <!-- Notifications Tab -->
             <div id="tab-notifications" class="tab-content">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;">
@@ -294,6 +480,182 @@
                                     <input type="checkbox" name="gradeNotifs" onchange="submitPreferences()" <%= (!student.preferences || student.preferences.gradeNotifs) ? 'checked' : '' %>>
                                     <span class="toggle-slider"></span>
                                 </label>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Internship Tab -->
+            <div id="tab-internship" class="tab-content">
+                <div style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
+                    <% if (student.internship && student.internship.companyName) { %>
+                        <!-- View Mode Card -->
+                        <div id="internshipViewCard" class="profile-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                                    <h3 style="margin: 0;">Internship Details</h3>
+                                </div>
+                                <button type="button" onclick="showInternshipForm()" style="padding: 8px 16px; background: rgba(99, 102, 241, 0.1); color: var(--primary); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    Edit Details
+                                </button>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;">
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Company Name</label>
+                                    <p style="font-size: 1.05rem; font-weight: 600; margin: 0; color: var(--text-main);"><%= student.internship.companyName %></p>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Field of Internship</label>
+                                    <p style="font-size: 1.05rem; font-weight: 600; margin: 0; color: var(--text-main);"><%= student.internship.internshipField %></p>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Duration</label>
+                                    <p style="font-size: 1.05rem; font-weight: 500; margin: 0; color: var(--text-main);"><%= student.internship.duration %></p>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Mode of Internship</label>
+                                    <span class="status-badge" style="background: rgba(6, 182, 212, 0.1); color: var(--accent); display: inline-block; margin-top: 4px;"><%= student.internship.mode %></span>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Type / Stipend</label>
+                                    <p style="font-size: 1.05rem; font-weight: 500; margin: 0; color: var(--text-main);">
+                                        <%= student.internship.isPaid %>
+                                        <% if (student.internship.isPaid === 'Paid') { %>
+                                            (Stipend: <%= student.internship.stipend %>)
+                                        <% } %>
+                                    </p>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Company Contact Details</label>
+                                    <p style="font-size: 1.05rem; font-weight: 500; margin: 0; color: var(--text-main);"><%= student.internship.contactDetails %></p>
+                                </div>
+                                <% if (student.internship.gitLink) { %>
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">GitHub Repository Link</label>
+                                        <a href="<%= student.internship.gitLink %>" target="_blank" style="color: var(--accent); font-size: 1.05rem; font-weight: 500; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                                            View GitHub Repo
+                                        </a>
+                                    </div>
+                                <% } %>
+                                <% if (student.internship.driveLink) { %>
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Google Drive Link</label>
+                                        <a href="<%= student.internship.driveLink %>" target="_blank" style="color: var(--accent); font-size: 1.05rem; font-weight: 500; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                                            View Google Drive
+                                        </a>
+                                    </div>
+                                <% } %>
+                                <% if (student.internship.offerLetter) { %>
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Offer Letter</label>
+                                        <a href="<%= student.internship.offerLetter %>" target="_blank" style="color: var(--accent); font-size: 1.05rem; font-weight: 500; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                            View Offer Letter
+                                        </a>
+                                    </div>
+                                <% } %>
+                                <% if (student.internship.mentorDetails) { %>
+                                    <div style="grid-column: span 2;">
+                                        <label style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Industry Mentor / Supervisor Details</label>
+                                        <p style="font-size: 1rem; font-weight: 500; margin: 0; color: var(--text-main); background: rgba(0,0,0,0.15); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); white-space: pre-line;"><%= student.internship.mentorDetails %></p>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } %>
+
+                    <!-- Form Card (shown by default if empty, hidden if view mode is active) -->
+                    <div id="internshipFormCard" class="profile-card" style="<%= (student.internship && student.internship.companyName) ? 'display: none;' : '' %>">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <h3 style="margin: 0;"><%= (student.internship && student.internship.companyName) ? 'Update Internship Details' : 'Setup Internship Profile' %></h3>
+                        </div>
+                        
+                        <form action="/student/internship-details" method="POST" enctype="multipart/form-data">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Company Name <span style="color: #ef4444;">*</span></label>
+                                    <input type="text" name="companyName" class="form-control" value="<%= (student.internship && student.internship.companyName) ? student.internship.companyName : '' %>" required placeholder="e.g. Google India">
+                                </div>
+                                <div class="form-group">
+                                    <label>Internship Field / Domain <span style="color: #ef4444;">*</span></label>
+                                    <input type="text" name="internshipField" class="form-control" value="<%= (student.internship && student.internship.internshipField) ? student.internship.internshipField : '' %>" required placeholder="e.g. Web Development, ML">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Duration <span style="color: #ef4444;">*</span></label>
+                                    <input type="text" name="duration" class="form-control" value="<%= (student.internship && student.internship.duration) ? student.internship.duration : '' %>" required placeholder="e.g. 3 months, 8 weeks">
+                                </div>
+                                <div class="form-group">
+                                    <label>Mode of Internship <span style="color: #ef4444;">*</span></label>
+                                    <select name="mode" class="form-control" required style="background: var(--input-bg);">
+                                        <option value="" disabled <%= !(student.internship && student.internship.mode) ? 'selected' : '' %>>Select Mode</option>
+                                        <option value="Remote" <%= (student.internship && student.internship.mode === 'Remote') ? 'selected' : '' %>>Remote</option>
+                                        <option value="Hybrid" <%= (student.internship && student.internship.mode === 'Hybrid') ? 'selected' : '' %>>Hybrid</option>
+                                        <option value="On-site" <%= (student.internship && student.internship.mode === 'On-site') ? 'selected' : '' %>>On-site</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Type <span style="color: #ef4444;">*</span></label>
+                                    <select name="isPaid" id="isPaidSelect" class="form-control" onchange="toggleStipendInput()" required style="background: var(--input-bg);">
+                                        <option value="" disabled <%= !(student.internship && student.internship.isPaid) ? 'selected' : '' %>>Select Paid Status</option>
+                                        <option value="Paid" <%= (student.internship && student.internship.isPaid === 'Paid') ? 'selected' : '' %>>Paid</option>
+                                        <option value="Unpaid" <%= (student.internship && student.internship.isPaid === 'Unpaid') ? 'selected' : '' %>>Unpaid</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="stipendInputGroup" style="display: <%= (student.internship && student.internship.isPaid === 'Paid') ? 'block' : 'none' %>;">
+                                    <label>Stipend (Monthly) <span style="color: #ef4444;">*</span></label>
+                                    <input type="number" id="stipendField" name="stipend" class="form-control" value="<%= (student.internship && student.internship.stipend) ? student.internship.stipend : '0' %>" placeholder="e.g. 15000">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Company Contact Details (Email or Phone) <span style="color: #ef4444;">*</span></label>
+                                <input type="text" name="contactDetails" class="form-control" value="<%= (student.internship && student.internship.contactDetails) ? student.internship.contactDetails : '' %>" required placeholder="e.g. hr@company.com or +91 9876543210">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>GitHub Repository Link <span style="color: #ef4444;">*</span></label>
+                                    <input type="url" name="gitLink" class="form-control" value="<%= (student.internship && student.internship.gitLink) ? student.internship.gitLink : '' %>" required placeholder="https://github.com/your-username/your-repo">
+                                </div>
+                                <div class="form-group">
+                                    <label>Google Drive Project Link (Optional)</label>
+                                    <input type="url" name="driveLink" class="form-control" value="<%= (student.internship && student.internship.driveLink) ? student.internship.driveLink : '' %>" placeholder="https://drive.google.com/...">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Offer Letter (PDF/Image) <span style="color: #ef4444;">*</span></label>
+                                <input type="file" name="offerLetter" class="form-control" <%= (student.internship && student.internship.offerLetter) ? '' : 'required' %>>
+                                <% if (student.internship && student.internship.offerLetter) { %>
+                                    <div style="margin-top: 8px; font-size: 0.85rem;">
+                                        <a href="<%= student.internship.offerLetter %>" target="_blank" style="color: var(--accent); text-decoration: none;">View Current Offer Letter</a>
+                                    </div>
+                                <% } %>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 24px;">
+                                <label>Industry Mentor / Supervisor Details (Optional)</label>
+                                <textarea name="mentorDetails" class="form-control" rows="3" style="resize: none;" placeholder="e.g. John Doe (Lead Engineer) - john.doe@company.com"><%= (student.internship && student.internship.mentorDetails) ? student.internship.mentorDetails : '' %></textarea>
+                            </div>
+
+                            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                                <% if (student.internship && student.internship.companyName) { %>
+                                    <button type="button" onclick="hideInternshipForm()" style="padding: 10px 20px; background: transparent; color: var(--text-muted); border: 1px solid var(--glass-border); border-radius: 8px; cursor: pointer; font-size: 0.9rem;">Cancel</button>
+                                <% } %>
+                                <button type="submit" class="auth-btn" style="width: auto; margin: 0; padding: 10px 24px;">Save Internship Details</button>
                             </div>
                         </form>
                     </div>
@@ -537,9 +899,57 @@
                 'dashboard': 'Dashboard',
                 'report': 'Manage Reports',
                 'notifications': 'Notifications',
+                'internship': 'Internship Details',
                 'settings': 'Settings'
             };
             document.getElementById('page-title').innerText = titles[tabId];
+        }
+
+        function toggleStipendInput() {
+            const isPaid = document.getElementById('isPaidSelect').value;
+            const stipendGroup = document.getElementById('stipendInputGroup');
+            const stipendField = document.getElementById('stipendField');
+            if (isPaid === 'Paid') {
+                stipendGroup.style.display = 'block';
+                stipendField.required = true;
+            } else {
+                stipendGroup.style.display = 'none';
+                stipendField.required = false;
+                stipendField.value = '0';
+            }
+        }
+
+        function showInternshipForm() {
+            const viewCard = document.getElementById('internshipViewCard');
+            if(viewCard) viewCard.style.display = 'none';
+            document.getElementById('internshipFormCard').style.display = 'block';
+        }
+
+        function hideInternshipForm() {
+            const viewCard = document.getElementById('internshipViewCard');
+            if(viewCard) {
+                viewCard.style.display = 'block';
+                document.getElementById('internshipFormCard').style.display = 'none';
+            }
+        }
+
+        function copyToClipboard(text, btnId) {
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById(btnId);
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!`;
+                btn.style.background = 'rgba(16, 185, 129, 0.2)';
+                btn.style.color = '#10b981';
+                btn.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
         }
 
         // Close dropdown when clicking outside
@@ -576,194 +986,276 @@
       </script>
     <% } %>
 
-  <!-- View / Edit Modal -->
-  <div id="viewEditModal" class="loader-overlay" style="z-index: 10000; align-items: center; justify-content: center;">
-      <div style="background: var(--card-bg); padding: 32px; border-radius: 16px; border: 1px solid var(--glass-border); width: 90%; max-width: 500px; backdrop-filter: blur(20px); position: relative;">
-          <!-- Edit Icon -->
-          <button type="button" id="enableEditBtn" onclick="enableEditMode()" style="position: absolute; top: 32px; right: 32px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--primary); width: 36px; height: 36px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Edit Report">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-          </button>
-          
-          <h3 id="viewEditModalTitle" style="margin-bottom: 24px;">Log Details</h3>
-          <form id="viewEditLogForm" action="" method="POST" enctype="multipart/form-data">
-              <div class="form-group">
-                  <label>Week Number</label>
-                  <input type="number" id="viewEditWeek" name="week" class="form-control" required readonly>
-              </div>
-              <div class="form-group">
-                  <label>Description</label>
-                  <textarea id="viewEditDesc" name="description" class="form-control" rows="4" style="resize: none;" required readonly></textarea>
-              </div>
-              <div class="form-group" style="margin-bottom: 24px;">
-                  <label>Supporting File (PDF/Image)</label>
-                  <!-- Initially disabled file input -->
-                  <input type="file" id="viewEditFile" name="file" class="form-control" disabled>
-                  <!-- Current file link if it exists -->
-                  <div id="currentFileLinkContainer" style="margin-top: 8px; font-size: 0.85rem; display: none;">
-                      <a id="currentFileLink" href="#" target="_blank" style="color: var(--accent); text-decoration: none;">View Attached Artifact</a>
+  <style>
+      .no-scrollbar::-webkit-scrollbar {
+          display: none;
+      }
+      .no-scrollbar {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+      }
+  </style>
+
+  <!-- Daily Task Submit / Edit Modal -->
+  <div id="taskModal" class="loader-overlay" style="z-index: 10000; align-items: center; justify-content: center;">
+      <div class="no-scrollbar" style="background: var(--card-bg); padding: 32px; border-radius: 16px; border: 1px solid var(--glass-border); width: 90%; max-width: 750px; backdrop-filter: blur(20px); max-height: 90vh; overflow-y: auto;">
+          <h3 id="taskModalTitle" style="margin-bottom: 24px;">Submit Daily Task Log</h3>
+          <form id="taskForm" action="/student/submit-task" method="POST" enctype="multipart/form-data">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                      <label>Week Number *</label>
+                      <input type="number" id="taskWeek" name="week" class="form-control" required placeholder="e.g. 1">
+                  </div>
+                  <div class="form-group">
+                      <label>Date *</label>
+                      <input type="date" id="taskDate" name="date" class="form-control" required>
                   </div>
               </div>
-              <!-- Optional Feedback Display -->
-              <div id="viewEditFeedbackContainer" class="form-group" style="display: none;">
-                  <label>Faculty Remarks</label>
-                  <div id="viewEditFeedback" style="background: rgba(239, 68, 68, 0.1); padding: 12px; border-radius: 8px; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.9rem; line-height: 1.4;"></div>
+              <div class="form-group">
+                  <label>Task Title *</label>
+                  <input type="text" id="taskTitle" name="title" class="form-control" required placeholder="e.g. Completed API integration">
               </div>
-
-              <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                  <button type="button" onclick="closeViewEditModal()" style="padding: 10px 20px; background: transparent; color: var(--text-muted); border: none; cursor: pointer; font-size: 0.9rem;">Close</button>
-                  <button type="submit" id="viewEditUpdateBtn" style="padding: 10px 20px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #ffffff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;" disabled>Update</button>
+              <div class="form-group">
+                  <label>Description of Work *</label>
+                  <textarea id="taskDesc" name="description" class="form-control" rows="4" style="resize: none;" required placeholder="Describe the details of your work today..."></textarea>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                      <label>Hours Worked *</label>
+                      <input type="number" step="0.5" id="taskHours" name="hoursWorked" class="form-control" required placeholder="e.g. 4.5">
+                  </div>
+                  <div class="form-group">
+                      <label>Status *</label>
+                      <select id="taskStatus" name="status" class="form-control" required>
+                          <option value="Completed">Completed</option>
+                          <option value="In Progress">In Progress</option>
+                          <option value="Blocked">Blocked</option>
+                      </select>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label id="taskFileLabel">Evidence File (Image/PDF)</label>
+                  <input type="file" id="taskFile" name="taskFile" class="form-control">
+                  <div id="currentTaskFileContainer" style="margin-top: 8px; font-size: 0.85rem; display: none;">
+                      <a id="currentTaskFileLink" href="#" target="_blank" style="color: var(--accent); text-decoration: none;">View Existing File</a>
+                  </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                  <div class="form-group">
+                      <label>GitHub Repository / PR Link</label>
+                      <input type="url" id="taskGit" name="gitLink" class="form-control" placeholder="https://github.com/...">
+                  </div>
+                  <div class="form-group">
+                      <label>Live Demo Link</label>
+                      <input type="url" id="taskDemo" name="demoLink" class="form-control" placeholder="https://demo.example.com">
+                  </div>
+              </div>
+              <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                  <button type="button" onclick="closeTaskModal()" style="padding: 10px 20px; background: transparent; color: var(--text-muted); border: none; cursor: pointer; font-size: 0.9rem;">Cancel</button>
+                  <button type="submit" id="taskModalBtn" style="padding: 10px 20px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #ffffff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">Submit Task</button>
               </div>
           </form>
       </div>
   </div>
 
-  <!-- Delete Confirmation Modal -->
-  <div id="deleteModal" class="loader-overlay" style="z-index: 10000; align-items: center; justify-content: center;">
+  <!-- Delete Task Confirmation Modal -->
+  <div id="deleteTaskModal" class="loader-overlay" style="z-index: 10000; align-items: center; justify-content: center;">
       <div style="background: var(--card-bg); padding: 32px; border-radius: 16px; border: 1px solid var(--glass-border); width: 90%; max-width: 400px; backdrop-filter: blur(20px); text-align: center;">
           <h3 style="margin-bottom: 16px; color: var(--text-main);">Confirm Deletion</h3>
-          <p style="color: var(--text-muted); margin-bottom: 24px;">Are you sure you want to delete this log? This action cannot be undone.</p>
+          <p style="color: var(--text-muted); margin-bottom: 24px;">Are you sure you want to delete this daily task log? This action cannot be undone.</p>
           <div style="display: flex; gap: 12px; justify-content: center;">
-              <button type="button" onclick="closeDeleteModal()" style="padding: 10px 20px; background: transparent; color: var(--text-muted); border: 1px solid var(--glass-border); border-radius: 8px; cursor: pointer; font-size: 0.9rem;">Cancel</button>
-              <form id="confirmDeleteForm" method="POST" style="margin: 0;">
+              <button type="button" onclick="closeDeleteTaskModal()" style="padding: 10px 20px; background: transparent; color: var(--text-muted); border: 1px solid var(--glass-border); border-radius: 8px; cursor: pointer; font-size: 0.9rem;">Cancel</button>
+              <form id="confirmDeleteTaskForm" method="POST" style="margin: 0;">
                   <button type="submit" style="padding: 10px 20px; background: #ef4444; color: #ffffff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">Delete</button>
               </form>
           </div>
       </div>
   </div>
 
-  <!-- Submit / Edit Modal -->
-  <div id="submitModal" class="loader-overlay" style="z-index: 10000; align-items: center; justify-content: center;">
-      <div style="background: var(--card-bg); padding: 32px; border-radius: 16px; border: 1px solid var(--glass-border); width: 90%; max-width: 500px; backdrop-filter: blur(20px);">
-          <h3 id="submitModalTitle" style="margin-bottom: 24px;">Submit Weekly Log</h3>
-          <form id="submitLogForm" action="/student/submitlog" method="POST" enctype="multipart/form-data">
+  <!-- Submit Weekly Summary Modal -->
+  <div id="summaryModal" class="loader-overlay" style="z-index: 10000; align-items: center; justify-content: center;">
+      <div class="no-scrollbar" style="background: var(--card-bg); padding: 32px; border-radius: 16px; border: 1px solid var(--glass-border); width: 90%; max-width: 750px; backdrop-filter: blur(20px); max-height: 90vh; overflow-y: auto;">
+          <h3 style="margin-bottom: 24px;">Submit Weekly Summary</h3>
+          <form id="summaryForm" action="/student/submit-summary" method="POST">
+              <div class="form-group">
+                  <label>Week Number *</label>
+                  <input type="number" id="summaryWeek" name="week" class="form-control" required placeholder="e.g. 1" oninput="onSummaryWeekChange()">
+              </div>
+              <div id="prevWeekGoalContainer" style="display: none; margin-bottom: 16px; padding: 12px; background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 8px;">
+                  <label style="font-size: 0.85rem; color: var(--primary); font-weight: 600; display: block; margin-bottom: 4px;">Previous Week's Goals Reference:</label>
+                  <div id="prevWeekGoalText" style="font-size: 0.85rem; line-height: 1.4; color: var(--text-main);"></div>
+              </div>
+              <div class="form-group">
+                  <label>Work Completed This Week *</label>
+                  <textarea name="workCompleted" class="form-control" rows="3" style="resize: none;" required placeholder="Summary of what you completed..."></textarea>
+              </div>
+              <div class="form-group">
+                  <label>Challenges Faced *</label>
+                  <textarea name="challengesFaced" class="form-control" rows="2" style="resize: none;" required placeholder="What challenges did you face?"></textarea>
+              </div>
+              <div class="form-group">
+                  <label>How Challenges Were Solved *</label>
+                  <textarea name="challengesSolved" class="form-control" rows="2" style="resize: none;" required placeholder="How did you overcome them?"></textarea>
+              </div>
+              <div class="form-group">
+                  <label>Skills Learned *</label>
+                  <input type="text" name="skillsLearned" class="form-control" required placeholder="e.g. Express, React, APIs (comma separated)">
+              </div>
+              <div class="form-group">
+                  <label>Goals for Next Week *</label>
+                  <textarea name="goalsNextWeek" class="form-control" rows="2" style="resize: none;" required placeholder="What are your target goals?"></textarea>
+              </div>
+              <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                  <button type="button" onclick="closeSummaryModal()" style="padding: 10px 20px; background: transparent; color: var(--text-muted); border: none; cursor: pointer; font-size: 0.9rem;">Cancel</button>
+                  <button type="submit" style="padding: 10px 20px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #ffffff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">Submit Summary</button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <!-- Edit Weekly Summary Modal -->
+  <div id="editSummaryModal" class="loader-overlay" style="z-index: 10000; align-items: center; justify-content: center;">
+      <div class="no-scrollbar" style="background: var(--card-bg); padding: 32px; border-radius: 16px; border: 1px solid var(--glass-border); width: 90%; max-width: 750px; backdrop-filter: blur(20px); max-height: 90vh; overflow-y: auto;">
+          <h3 style="margin-bottom: 24px;">Edit Weekly Summary</h3>
+          <form id="editSummaryForm" action="" method="POST">
               <div class="form-group">
                   <label>Week Number</label>
-                  <input type="number" id="submitWeek" name="week" class="form-control" required placeholder="e.g. 1">
+                  <input type="number" id="editSummaryWeek" class="form-control" disabled>
               </div>
               <div class="form-group">
-                  <label>Description</label>
-                  <textarea id="submitDesc" name="description" class="form-control" rows="4" style="resize: none;" required placeholder="What did you learn this week?"></textarea>
+                  <label>Work Completed This Week *</label>
+                  <textarea id="editSummaryCompleted" name="workCompleted" class="form-control" rows="3" style="resize: none;" required></textarea>
               </div>
-              <div class="form-group" style="margin-bottom: 24px;">
-                  <label id="submitFileLabel">Supporting File (PDF/Image)</label>
-                  <input type="file" id="submitFile" name="logFile" class="form-control" required>
+              <div class="form-group">
+                  <label>Challenges Faced *</label>
+                  <textarea id="editSummaryChallenges" name="challengesFaced" class="form-control" rows="2" style="resize: none;" required></textarea>
               </div>
-              <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                  <button type="button" onclick="closeSubmitModal()" style="padding: 10px 20px; background: transparent; color: var(--text-muted); border: none; cursor: pointer; font-size: 0.9rem;">Cancel</button>
-                  <button type="submit" id="submitModalBtn" style="padding: 10px 20px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #ffffff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">Submit Entry</button>
+              <div class="form-group">
+                  <label>How Challenges Were Solved *</label>
+                  <textarea id="editSummarySolved" name="challengesSolved" class="form-control" rows="2" style="resize: none;" required></textarea>
+              </div>
+              <div class="form-group">
+                  <label>Skills Learned *</label>
+                  <input type="text" id="editSummarySkills" name="skillsLearned" class="form-control" required>
+              </div>
+              <div class="form-group">
+                  <label>Goals for Next Week *</label>
+                  <textarea id="editSummaryGoals" name="goalsNextWeek" class="form-control" rows="2" style="resize: none;" required></textarea>
+              </div>
+              <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                  <button type="button" onclick="closeEditSummaryModal()" style="padding: 10px 20px; background: transparent; color: var(--text-muted); border: none; cursor: pointer; font-size: 0.9rem;">Cancel</button>
+                  <button type="submit" style="padding: 10px 20px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #ffffff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">Save Changes</button>
               </div>
           </form>
       </div>
   </div>
 
   <script>
-    let currentLogId = null;
+    const goalsByWeek = {
+        <% weeklySummaries.forEach(s => { %>
+            '<%= s.week %>': `<%= s.goalsNextWeek ? s.goalsNextWeek.replace(/`/g, '\\`').replace(/\n/g, '\\n').replace(/\r/g, '') : '' %>`,
+        <% }) %>
+    };
 
-    function openCreateModal() {
-        document.getElementById('submitModalTitle').innerText = 'Submit Weekly Log';
-        document.getElementById('submitLogForm').action = '/student/submitlog';
-        document.getElementById('submitFile').name = 'logFile';
-        document.getElementById('submitFile').required = true;
-        document.getElementById('submitFileLabel').innerText = 'Supporting File (PDF/Image)';
-        document.getElementById('submitModalBtn').innerText = 'Submit Entry';
-        
-        document.getElementById('submitWeek').value = '';
-        document.getElementById('submitDesc').value = '';
-        
-        document.getElementById('submitModal').classList.add('active');
-    }
-
-    function closeSubmitModal() {
-        document.getElementById('submitModal').classList.remove('active');
-    }
-
-    function openViewEditModal(btn) {
-        const id = btn.getAttribute('data-id');
-        const week = btn.getAttribute('data-week');
-        const status = btn.getAttribute('data-status');
-        const fileUrl = btn.getAttribute('data-file');
-        
-        // Find desc and feedback in sibling elements
-        const td = btn.closest('td');
-        const desc = td.querySelector('.hidden-desc').innerText;
-        const feedback = td.querySelector('.hidden-feedback').innerText;
-
-        currentLogId = id;
-        document.getElementById('viewEditLogForm').action = '/student/editlog/' + currentLogId;
-
-        document.getElementById('viewEditWeek').value = week;
-        document.getElementById('viewEditDesc').value = desc;
-
-        // Reset to read-only mode
-        document.getElementById('viewEditWeek').readOnly = true;
-        document.getElementById('viewEditDesc').readOnly = true;
-        document.getElementById('viewEditFile').disabled = true;
-        document.getElementById('viewEditFile').style.display = 'none'; // Hide input entirely in view mode
-        
-        const updateBtn = document.getElementById('viewEditUpdateBtn');
-        updateBtn.disabled = true;
-        
-        const editBtn = document.getElementById('enableEditBtn');
-        if (status === 'Approved') {
-            editBtn.style.display = 'none';
-        } else {
-            editBtn.style.display = 'flex';
-        }
-
-        const fileContainer = document.getElementById('currentFileLinkContainer');
-        if (fileUrl && fileUrl.trim() !== '') {
-            fileContainer.style.display = 'block';
-            document.getElementById('currentFileLink').href = fileUrl;
-        } else {
-            fileContainer.style.display = 'none';
-        }
-
-        const fbContainer = document.getElementById('viewEditFeedbackContainer');
-        if (feedback && feedback.trim() !== '') {
-            fbContainer.style.display = 'block';
-            document.getElementById('viewEditFeedback').innerText = feedback;
-            if(status.toLowerCase() === 'approved') {
-                document.getElementById('viewEditFeedback').style.color = '#10b981';
-                document.getElementById('viewEditFeedback').style.background = 'rgba(16, 185, 129, 0.1)';
-                document.getElementById('viewEditFeedback').style.border = '1px solid rgba(16, 185, 129, 0.2)';
+    function onSummaryWeekChange() {
+        const weekVal = parseInt(document.getElementById('summaryWeek').value);
+        if (weekVal > 1) {
+            const prevWeekGoal = goalsByWeek[weekVal - 1];
+            if (prevWeekGoal) {
+                document.getElementById('prevWeekGoalContainer').style.display = 'block';
+                document.getElementById('prevWeekGoalText').innerText = prevWeekGoal;
             } else {
-                document.getElementById('viewEditFeedback').style.color = '#ef4444';
-                document.getElementById('viewEditFeedback').style.background = 'rgba(239, 68, 68, 0.1)';
-                document.getElementById('viewEditFeedback').style.border = '1px solid rgba(239, 68, 68, 0.2)';
+                document.getElementById('prevWeekGoalContainer').style.display = 'block';
+                document.getElementById('prevWeekGoalText').innerText = "No summary found for Week " + (weekVal - 1) + ".";
             }
         } else {
-            fbContainer.style.display = 'none';
+            document.getElementById('prevWeekGoalContainer').style.display = 'none';
         }
-
-        document.getElementById('viewEditModalTitle').innerText = 'Log Details';
-        document.getElementById('viewEditModal').classList.add('active');
     }
 
-    function enableEditMode() {
-        document.getElementById('viewEditModalTitle').innerText = 'Update Log Details';
-        document.getElementById('viewEditWeek').readOnly = false;
-        document.getElementById('viewEditDesc').readOnly = false;
-        document.getElementById('viewEditFile').disabled = false;
-        document.getElementById('viewEditFile').style.display = 'block'; // Show file input when editing
+    function openTaskModal(btn) {
+        if (!btn) {
+            document.getElementById('taskModalTitle').innerText = 'Submit Daily Task Log';
+            document.getElementById('taskForm').action = '/student/submit-task';
+            document.getElementById('taskFile').required = false;
+            document.getElementById('taskModalBtn').innerText = 'Submit Task';
+            
+            document.getElementById('taskWeek').value = '';
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('taskDesc').value = '';
+            document.getElementById('taskHours').value = '';
+            document.getElementById('taskStatus').value = 'Completed';
+            document.getElementById('taskGit').value = '';
+            document.getElementById('taskDemo').value = '';
+            document.getElementById('currentTaskFileContainer').style.display = 'none';
+        } else {
+            document.getElementById('taskModalTitle').innerText = 'Edit Daily Task Log';
+            const id = btn.getAttribute('data-id');
+            document.getElementById('taskForm').action = '/student/edit-task/' + id;
+            document.getElementById('taskFile').required = false;
+            document.getElementById('taskModalBtn').innerText = 'Save Changes';
+            
+            document.getElementById('taskWeek').value = btn.getAttribute('data-week');
+            document.getElementById('taskTitle').value = btn.getAttribute('data-title');
+            document.getElementById('taskDate').value = btn.getAttribute('data-date');
+            document.getElementById('taskDesc').value = btn.getAttribute('data-desc');
+            document.getElementById('taskHours').value = btn.getAttribute('data-hours');
+            document.getElementById('taskStatus').value = btn.getAttribute('data-status');
+            document.getElementById('taskGit').value = btn.getAttribute('data-git');
+            document.getElementById('taskDemo').value = btn.getAttribute('data-demo');
+            
+            const fileUrl = btn.getAttribute('data-file');
+            if (fileUrl) {
+                document.getElementById('currentTaskFileContainer').style.display = 'block';
+                document.getElementById('currentTaskFileLink').href = fileUrl;
+            } else {
+                document.getElementById('currentTaskFileContainer').style.display = 'none';
+            }
+        }
+        document.getElementById('taskModal').classList.add('active');
+    }
+
+    function closeTaskModal() {
+        document.getElementById('taskModal').classList.remove('active');
+    }
+
+    function openDeleteTaskModal(id) {
+        document.getElementById('confirmDeleteTaskForm').action = '/student/delete-task/' + id;
+        document.getElementById('deleteTaskModal').classList.add('active');
+    }
+
+    function closeDeleteTaskModal() {
+        document.getElementById('deleteTaskModal').classList.remove('active');
+    }
+
+    function openSummaryModal() {
+        document.getElementById('summaryWeek').value = '';
+        document.getElementById('summaryForm').reset();
+        document.getElementById('prevWeekGoalContainer').style.display = 'none';
+        document.getElementById('summaryModal').classList.add('active');
+    }
+
+    function closeSummaryModal() {
+        document.getElementById('summaryModal').classList.remove('active');
+    }
+
+    function openEditSummaryModal(btn) {
+        const id = btn.getAttribute('data-id');
+        document.getElementById('editSummaryForm').action = '/student/edit-summary/' + id;
         
-        const updateBtn = document.getElementById('viewEditUpdateBtn');
-        updateBtn.disabled = false;
+        document.getElementById('editSummaryWeek').value = btn.getAttribute('data-week');
+        document.getElementById('editSummaryCompleted').value = btn.getAttribute('data-completed');
+        document.getElementById('editSummaryChallenges').value = btn.getAttribute('data-challenges');
+        document.getElementById('editSummarySolved').value = btn.getAttribute('data-solutions');
+        document.getElementById('editSummarySkills').value = btn.getAttribute('data-skills');
+        document.getElementById('editSummaryGoals').value = btn.getAttribute('data-goals');
+        
+        document.getElementById('editSummaryModal').classList.add('active');
     }
 
-    function closeViewEditModal() {
-        document.getElementById('viewEditModal').classList.remove('active');
-    }
-
-    function openDeleteModal(id) {
-        document.getElementById('confirmDeleteForm').action = '/student/deletelog/' + id;
-        document.getElementById('deleteModal').classList.add('active');
-    }
-
-    function closeDeleteModal() {
-        document.getElementById('deleteModal').classList.remove('active');
+    function closeEditSummaryModal() {
+        document.getElementById('editSummaryModal').classList.remove('active');
     }
   </script>
 
