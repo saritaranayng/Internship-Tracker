@@ -63,6 +63,30 @@
             <div class="top-bar">
                 <h2 id="page-title">Dashboard</h2>
                 <div style="display: flex; align-items: center; gap: 20px;">
+                    <div style="position: relative;">
+                        <button class="notif-btn" onclick="document.getElementById('notifDropdown').classList.toggle('show'); event.stopPropagation();">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                            <% const unreadNotifs = notifications.filter(n => !n.isRead); %>
+                            <% if(unreadNotifs.length > 0) { %>
+                                <span class="notif-badge"><%= unreadNotifs.length %></span>
+                            <% } %>
+                        </button>
+                        <div class="notif-dropdown" id="notifDropdown" onclick="event.stopPropagation();">
+                            <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-main); border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">Notifications</h4>
+                            <% if(notifications.length === 0) { %>
+                                <div class="notif-item" style="text-align: center; color: var(--text-muted);">No notifications</div>
+                            <% } else { %>
+                                <% notifications.slice(0, 5).forEach(n => { %>
+                                    <div class="notif-item">
+                                        <div style="color: var(--text-main);"><%= n.message %></div>
+                                        <div class="date"><%= new Date(n.createdAt).toLocaleString() %></div>
+                                    </div>
+                                <% }) %>
+                                <div class="notif-item" style="text-align: center; cursor: pointer; color: var(--primary); border-top: 1px solid var(--glass-border); padding-top: 8px; margin-top: 4px;" onclick="switchTab('notifications'); document.getElementById('notifDropdown').classList.remove('show');">View all notifications</div>
+                            <% } %>
+                        </div>
+                    </div>
+                    
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="text-align: right;">
                             <p style="font-size: 0.9rem; font-weight: bold;"><%= student.firstname %></p>
@@ -398,6 +422,7 @@
                                                                 data-solutions="<%= sum.challengesSolved %>"
                                                                 data-skills="<%= sum.skillsLearned %>"
                                                                 data-goals="<%= sum.goalsNextWeek %>"
+                                                                data-file="<%= sum.file %>"
                                                                 onclick="openEditSummaryModal(this)"
                                                                 style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.2); color: var(--primary); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;" title="Edit Summary">
                                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -1076,7 +1101,7 @@
   <div id="summaryModal" class="loader-overlay" style="z-index: 10000; align-items: center; justify-content: center;">
       <div class="no-scrollbar" style="background: var(--card-bg); padding: 32px; border-radius: 16px; border: 1px solid var(--glass-border); width: 90%; max-width: 750px; backdrop-filter: blur(20px); max-height: 90vh; overflow-y: auto;">
           <h3 style="margin-bottom: 24px;">Submit Weekly Summary</h3>
-          <form id="summaryForm" action="/student/submit-summary" method="POST">
+          <form id="summaryForm" action="/student/submit-summary" method="POST" enctype="multipart/form-data">
               <div class="form-group">
                   <label>Week Number *</label>
                   <input type="number" id="summaryWeek" name="week" class="form-control" required placeholder="e.g. 1" oninput="onSummaryWeekChange()">
@@ -1105,6 +1130,10 @@
                   <label>Goals for Next Week *</label>
                   <textarea name="goalsNextWeek" class="form-control" rows="2" style="resize: none;" required placeholder="What are your target goals?"></textarea>
               </div>
+              <div class="form-group">
+                  <label>Summary File (Optional PDF/Image)</label>
+                  <input type="file" name="summaryFile" class="form-control">
+              </div>
               <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
                   <button type="button" onclick="closeSummaryModal()" style="padding: 10px 20px; background: transparent; color: var(--text-muted); border: none; cursor: pointer; font-size: 0.9rem;">Cancel</button>
                   <button type="submit" style="padding: 10px 20px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #ffffff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">Submit Summary</button>
@@ -1117,7 +1146,7 @@
   <div id="editSummaryModal" class="loader-overlay" style="z-index: 10000; align-items: center; justify-content: center;">
       <div class="no-scrollbar" style="background: var(--card-bg); padding: 32px; border-radius: 16px; border: 1px solid var(--glass-border); width: 90%; max-width: 750px; backdrop-filter: blur(20px); max-height: 90vh; overflow-y: auto;">
           <h3 style="margin-bottom: 24px;">Edit Weekly Summary</h3>
-          <form id="editSummaryForm" action="" method="POST">
+          <form id="editSummaryForm" action="" method="POST" enctype="multipart/form-data">
               <div class="form-group">
                   <label>Week Number</label>
                   <input type="number" id="editSummaryWeek" class="form-control" disabled>
@@ -1141,6 +1170,13 @@
               <div class="form-group">
                   <label>Goals for Next Week *</label>
                   <textarea id="editSummaryGoals" name="goalsNextWeek" class="form-control" rows="2" style="resize: none;" required></textarea>
+              </div>
+              <div class="form-group">
+                  <label>Summary File (Optional PDF/Image)</label>
+                  <input type="file" name="summaryFile" class="form-control">
+                  <div id="currentSummaryFileContainer" style="margin-top: 8px; font-size: 0.85rem; display: none;">
+                      <a id="currentSummaryFileLink" href="#" target="_blank" style="color: var(--accent); text-decoration: none;">View Existing File</a>
+                  </div>
               </div>
               <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
                   <button type="button" onclick="closeEditSummaryModal()" style="padding: 10px 20px; background: transparent; color: var(--text-muted); border: none; cursor: pointer; font-size: 0.9rem;">Cancel</button>
@@ -1250,6 +1286,14 @@
         document.getElementById('editSummarySolved').value = btn.getAttribute('data-solutions');
         document.getElementById('editSummarySkills').value = btn.getAttribute('data-skills');
         document.getElementById('editSummaryGoals').value = btn.getAttribute('data-goals');
+        
+        const fileUrl = btn.getAttribute('data-file');
+        if (fileUrl) {
+            document.getElementById('currentSummaryFileContainer').style.display = 'block';
+            document.getElementById('currentSummaryFileLink').href = fileUrl;
+        } else {
+            document.getElementById('currentSummaryFileContainer').style.display = 'none';
+        }
         
         document.getElementById('editSummaryModal').classList.add('active');
     }
@@ -1392,18 +1436,77 @@
       const loader = document.getElementById("global-loader");
       
       forms.forEach(form => {
-        form.addEventListener("submit", function() {
-          if (form.checkValidity()) {
-            loader.classList.add("active");
-            const buttons = form.querySelectorAll("button[type='submit']");
-            setTimeout(() => {
-                buttons.forEach(btn => {
-                    btn.disabled = true;
-                    btn.innerText = 'Processing...';
-                    btn.style.opacity = '0.7';
-                    btn.style.cursor = 'not-allowed';
-                });
-            }, 0);
+        form.addEventListener("submit", async function(e) {
+          if (!form.checkValidity()) return;
+          
+          const isAjax = form.id === 'summaryForm' || form.id === 'editSummaryForm';
+          if (isAjax) {
+              e.preventDefault();
+          }
+          
+          loader.classList.add("active");
+          const buttons = form.querySelectorAll("button[type='submit']");
+          const originalTexts = [];
+          
+          buttons.forEach(btn => {
+              originalTexts.push(btn.innerText);
+              btn.disabled = true;
+              btn.innerText = 'Processing...';
+              btn.style.opacity = '0.7';
+              btn.style.cursor = 'not-allowed';
+          });
+          
+          if (isAjax) {
+              try {
+                  const response = await fetch(form.action, {
+                      method: form.method,
+                      body: new FormData(form),
+                      headers: { 'Accept': 'application/json' }
+                  });
+                  const result = await response.json();
+                  
+                  if (result.success) {
+                      window.location.reload();
+                  } else {
+                      loader.classList.remove("active");
+                      buttons.forEach((btn, i) => {
+                          btn.disabled = false;
+                          btn.innerText = originalTexts[i] || 'Submit';
+                          btn.style.opacity = '1';
+                          btn.style.cursor = 'pointer';
+                      });
+                      if (typeof Toastify !== 'undefined') {
+                          Toastify({
+                              text: result.message,
+                              duration: 3000,
+                              gravity: "top",
+                              position: "right",
+                              style: { background: "#ef4444", borderRadius: "8px" }
+                          }).showToast();
+                      } else {
+                          alert(result.message);
+                      }
+                  }
+              } catch (err) {
+                  loader.classList.remove("active");
+                  buttons.forEach((btn, i) => {
+                      btn.disabled = false;
+                      btn.innerText = originalTexts[i] || 'Submit';
+                      btn.style.opacity = '1';
+                      btn.style.cursor = 'pointer';
+                  });
+                  if (typeof Toastify !== 'undefined') {
+                      Toastify({
+                          text: "A network error occurred.",
+                          duration: 3000,
+                          gravity: "top",
+                          position: "right",
+                          style: { background: "#ef4444", borderRadius: "8px" }
+                      }).showToast();
+                  } else {
+                      alert("A network error occurred.");
+                  }
+              }
           }
         });
       });

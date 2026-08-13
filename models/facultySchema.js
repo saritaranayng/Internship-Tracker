@@ -6,7 +6,8 @@ const facultySchema=mongoose.Schema({
     firstname:String,
     lastname:String,
     designation:String,
-    department:String
+    department:String,
+    profilePicture: { type: String, default: "" }
 })
 const faculty=mongoose.model("Faculty",facultySchema)
 

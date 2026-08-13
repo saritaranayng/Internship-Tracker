@@ -153,6 +153,7 @@ exports.facultydashboard = async (req, res) => {
                     goalsNextWeek: summary.goalsNextWeek,
                     status: summary.status,
                     feedback: summary.feedback,
+                    file: summary.file,
                     allowTaskEdits: summary.allowTaskEdits,
                     date: summary.date ? summary.date.toLocaleDateString() : "N/A",
                     tasks: summaryTasks
@@ -168,6 +169,7 @@ exports.facultydashboard = async (req, res) => {
         res.render('facultydashboard', {
             staff,
             students: studentSummaries, // Keeping the variable name 'students' to minimize changes in facultydashboard EJS
+            allStudents: studentsInDept,
             notifications,
             message
         });
@@ -249,4 +251,24 @@ exports.facultyLogout = (req, res) => {
     });
 };
 
+exports.updateProfile = async (req, res) => {
+    try {
+        const { firstname, lastname, email, designation, department } = req.body;
+        const updateData = { firstname, lastname, email, designation, department };
 
+        if (req.file) {
+            updateData.profilePicture = req.file.path;
+        }
+
+        const faculty = require('../models/facultySchema').faculty;
+        await faculty.findOneAndUpdate({ email: req.session.email }, updateData);
+        req.session.email = email; // In case they update their email
+        
+        req.session.message = "Profile updated successfully!";
+        res.redirect('/faculty/dashboard');
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        req.session.message = "Failed to update profile.";
+        res.redirect('/faculty/dashboard');
+    }
+};

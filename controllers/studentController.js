@@ -320,19 +320,19 @@ exports.submitSummary = async (req, res) => {
 
         const weekNum = Number(week);
 
+        const isJson = req.xhr || (req.headers.accept && req.headers.accept.includes('json'));
+
         // 1. Check if summary already exists
         const existing = await WeeklySummary.findOne({ studentId: studentData._id, week: weekNum });
         if (existing) {
-            req.session.message = `Error: A weekly summary for Week ${week} has already been submitted.`;
+            const msg = `Error: A weekly summary for Week ${week} has already been submitted.`;
+            if (isJson) return res.json({ success: false, message: msg });
+            req.session.message = msg;
             return res.redirect('/student/dashboard');
         }
 
-        // 2. Check if at least one daily task exists
-        const taskCount = await DailyTask.countDocuments({ studentId: studentData._id, week: weekNum });
-        if (taskCount === 0) {
-            req.session.message = `Error: You must submit at least one daily task log for Week ${week} before submitting a weekly summary.`;
-            return res.redirect('/student/dashboard');
-        }
+
+        const fileUrl = req.file ? req.file.path : '';
 
         const newSummary = new WeeklySummary({
             studentId: studentData._id,
@@ -342,7 +342,8 @@ exports.submitSummary = async (req, res) => {
             challengesSolved,
             skillsLearned,
             goalsNextWeek,
-            status: 'Pending'
+            status: 'Pending',
+            file: fileUrl
         });
 
         await newSummary.save();
@@ -361,17 +362,25 @@ exports.submitSummary = async (req, res) => {
             await Notification.insertMany(notifications);
         }
 
+        if (isJson) {
+            return res.json({ success: true, message: 'Weekly summary submitted successfully!' });
+        }
         req.session.message = 'Weekly summary submitted successfully!';
         res.redirect('/student/dashboard');
     } catch (err) {
         console.error("Error submitting summary:", err);
-        req.session.message = 'Error submitting weekly summary!';
+        require('fs').appendFileSync('error_log.txt', new Date().toISOString() + ': ' + (err.stack || err) + '\n');
+        const msg = 'Error submitting weekly summary! ' + (err.message || '');
+        const isJson = req.xhr || (req.headers && req.headers.accept && req.headers.accept.includes('json'));
+        if (isJson) return res.json({ success: false, message: msg });
+        req.session.message = msg;
         res.redirect('/student/dashboard');
     }
 };
 
 exports.editSummary = async (req, res) => {
     try {
+        const isJson = req.xhr || (req.headers.accept && req.headers.accept.includes('json'));
         const summaryId = req.params.id;
         const { workCompleted, challengesFaced, challengesSolved, skillsLearned, goalsNextWeek } = req.body;
         const studentData = await student.findOne({ rollno: req.session.rollno, email: req.session.email });
@@ -379,13 +388,22 @@ exports.editSummary = async (req, res) => {
 
         const summary = await WeeklySummary.findById(summaryId);
         if (!summary) {
-            req.session.message = 'Weekly summary not found.';
+            const msg = 'Weekly summary not found.';
+            if (isJson) return res.json({ success: false, message: msg });
+            req.session.message = msg;
             return res.redirect('/student/dashboard');
         }
 
         if (summary.status === 'Approved') {
-            req.session.message = 'Approved weekly summaries cannot be edited.';
+            const msg = 'Approved weekly summaries cannot be edited.';
+            if (isJson) return res.json({ success: false, message: msg });
+            req.session.message = msg;
             return res.redirect('/student/dashboard');
+        }
+
+        let fileUrl = summary.file;
+        if (req.file) {
+            fileUrl = req.file.path;
         }
 
         summary.workCompleted = workCompleted;
@@ -393,6 +411,7 @@ exports.editSummary = async (req, res) => {
         summary.challengesSolved = challengesSolved;
         summary.skillsLearned = skillsLearned;
         summary.goalsNextWeek = goalsNextWeek;
+        summary.file = fileUrl;
         summary.status = 'Pending'; // Change back to Pending after edit
 
         await summary.save();
@@ -408,11 +427,17 @@ exports.editSummary = async (req, res) => {
             await Notification.insertMany(notifications);
         }
 
+        if (isJson) {
+            return res.json({ success: true, message: 'Weekly summary updated successfully!' });
+        }
         req.session.message = 'Weekly summary updated successfully!';
         res.redirect('/student/dashboard');
     } catch (err) {
         console.error("Error editing summary:", err);
-        req.session.message = 'Error updating weekly summary!';
+        const msg = 'Error updating weekly summary!';
+        const isJson = req.xhr || (req.headers && req.headers.accept && req.headers.accept.includes('json'));
+        if (isJson) return res.json({ success: false, message: msg });
+        req.session.message = msg;
         res.redirect('/student/dashboard');
     }
 };

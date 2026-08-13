@@ -1,14 +1,24 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
+const { WeeklySummary } = require("./models/weeklySummary");
 
-async function testConnection() {
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/internship-tracker").then(async () => {
     try {
-        await mongoose.connect('mongodb+srv://saritarana830:saritamongo@saritacluster.hy1q1.mongodb.net/?appName=SaritaCluster');
-        console.log('Successfully connected to MongoDB Atlas!');
-        process.exit(0);
+        const newSummary = new WeeklySummary({
+            studentId: new mongoose.Types.ObjectId(),
+            week: 2,
+            workCompleted: "work",
+            challengesFaced: "challenges",
+            challengesSolved: "solutions",
+            skillsLearned: "skills",
+            goalsNextWeek: "goals",
+            status: 'Pending',
+            file: ''
+        });
+        await newSummary.save();
+        console.log("Success");
     } catch (err) {
-        console.error('Failed to connect:', err);
-        process.exit(1);
+        console.error("Error:", err);
     }
-}
-
-testConnection();
+    mongoose.disconnect();
+});

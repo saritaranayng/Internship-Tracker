@@ -39,6 +39,10 @@ const weeklySummarySchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    file: {
+        type: String,
+        default: ''
+    },
     allowTaskEdits: {
         type: Boolean,
         default: false
