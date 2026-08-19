@@ -13,4 +13,8 @@ router.get('/jobs', homedetails.viewJobs);
 router.get('/courses', homedetails.viewCourses);
 router.get('/certifications', homedetails.viewCertifications);
 
+router.get('/about', homedetails.aboutUs);
+router.get('/contact', homedetails.contactUs);
+router.get('/privacy', homedetails.privacyPolicy);
+
 module.exports = router;

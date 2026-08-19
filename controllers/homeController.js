@@ -63,3 +63,15 @@ exports.viewCertifications = (req, res) => {
   }));
   res.render('categoryCards', { title: 'Certifications', items: certs });
 };
+
+exports.aboutUs = (req, res) => {
+  res.render('about');
+};
+
+exports.contactUs = (req, res) => {
+  res.render('contact');
+};
+
+exports.privacyPolicy = (req, res) => {
+  res.render('privacy');
+};
